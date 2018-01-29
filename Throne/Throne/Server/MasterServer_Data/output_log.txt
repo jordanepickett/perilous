@@ -1,0 +1,105 @@
+Initialize engine version: 5.6.1f1 (2860b30f0b54)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GTX 770 (ID=0x1184)
+    Vendor:   NVIDIA
+    VRAM:     3072 MB
+    Driver:   22.21.13.8528
+Begin MonoManager ReloadAssembly
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\UnityEngine.Analytics.dll (this message is harmless)
+Loading E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\UnityEngine.Analytics.dll into Unity Child Domain
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\LiteDB.dll (this message is harmless)
+Loading E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\LiteDB.dll into Unity Child Domain
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\websocket-sharp.dll (this message is harmless)
+Loading E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\websocket-sharp.dll into Unity Child Domain
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\BarebonesLogger.dll (this message is harmless)
+Loading E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\BarebonesLogger.dll into Unity Child Domain
+- Completed reload, in  0.020 seconds
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\System.dll (this message is harmless)
+desktop: 1920x1080 120Hz; virtual: 3520x1080 at -1600,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 1.106243 ms
+Setting up 2 worker threads for Enlighten.
+  Thread -> id: 8408 -> priority: 1 
+  Thread -> id: 7f74 -> priority: 1 
+Platform assembly: E:\GitHub\Throne\Throne\Server\MasterServer_Data\Managed\Mono.Security.dll (this message is harmless)
+11/5/2017 7:00:00 PM|Fatal|WebSocket.connect:0|System.Net.Sockets.SocketException: No connection could be made because the target machine actively refused it.
+                           
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPEndPoint remote_end_point) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPAddress[] ipAddresses, Int32 port) [0x00000] in <filename unknown>:0 
+11/5/2017 7:00:01 PM|Fatal|WebSocket.connect:0|System.Net.Sockets.SocketException: No connection could be made because the target machine actively refused it.
+                           
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPEndPoint remote_end_point) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPAddress[] ipAddresses, Int32 port) [0x00000] in <filename unknown>:0 
+11/5/2017 7:00:02 PM|Fatal|WebSocket.connect:0|System.Net.Sockets.SocketException: No connection could be made because the target machine actively refused it.
+                           
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPEndPoint remote_end_point) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPAddress[] ipAddresses, Int32 port) [0x00000] in <filename unknown>:0 
+11/5/2017 7:00:05 PM|Fatal|WebSocket.connect:0|System.Net.Sockets.SocketException: No connection could be made because the target machine actively refused it.
+                           
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPEndPoint remote_end_point) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPAddress[] ipAddresses, Int32 port) [0x00000] in <filename unknown>:0 
+11/5/2017 7:00:10 PM|Fatal|WebSocket.connect:0|System.Net.Sockets.SocketException: No connection could be made because the target machine actively refused it.
+                           
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPEndPoint remote_end_point) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPAddress[] ipAddresses, Int32 port) [0x00000] in <filename unknown>:0 
+11/5/2017 7:00:15 PM|Fatal|WebSocket.connect:0|System.Net.Sockets.SocketException: No connection could be made because the target machine actively refused it.
+                           
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPEndPoint remote_end_point) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPAddress[] ipAddresses, Int32 port) [0x00000] in <filename unknown>:0 
+11/5/2017 7:00:19 PM|Fatal|WebSocket.connect:0|System.Net.Sockets.SocketException: No connection could be made because the target machine actively refused it.
+                           
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPEndPoint remote_end_point) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPAddress[] ipAddresses, Int32 port) [0x00000] in <filename unknown>:0 
+11/5/2017 7:00:24 PM|Fatal|WebSocket.connect:0|System.Net.Sockets.SocketException: No connection could be made because the target machine actively refused it.
+                           
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP, Boolean requireSocketPolicy) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.Connect (System.Net.EndPoint remoteEP) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPEndPoint remote_end_point) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpClient.Connect (System.Net.IPAddress[] ipAddresses, Int32 port) [0x00000] in <filename unknown>:0 
+11/5/2017 7:00:25 PM|Error|WebSocketServer.Stop:0|This operation is not available in: ready
+[Info | MasterServerBehaviour] Started on port: 5000
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+[Info | ConnectionToMaster] Connected to: 127.0.0.1:5000
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+11/5/2017 8:24:14 PM|Fatal|WebSocketServer.receiveRequest:0|System.ObjectDisposedException: The object was used after being disposed.
+                             at System.Net.Sockets.Socket+SocketAsyncResult.CheckIfThrowDelayedException () [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.EndAccept (System.Byte[]& buffer, System.Int32& bytesTransferred, IAsyncResult asyncResult) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.Socket.EndAccept (IAsyncResult result) [0x00000] in <filename unknown>:0 
+                             at System.Net.Sockets.TcpListener.EndAcceptTcpClient (IAsyncResult asyncResult) [0x00000] in <filename unknown>:0 
+                             at WebSocketSharp.Server.WebSocketServer.receiveRequest () [0x00000] in <filename unknown>:0 
+11/5/2017 8:24:14 PM|Error|WebSocket.Close:0|This operation is not available in: closed
+[Error | Logs] An error has occurred in closing the connection.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
