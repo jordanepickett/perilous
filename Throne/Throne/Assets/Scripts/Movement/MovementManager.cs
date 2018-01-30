@@ -36,7 +36,7 @@ public class MovementManager : MonoBehaviour {
                 unit.gameObject.GetComponent<Movement>().MoveUnit(newPoint);
                 break;
             }
-            newPoint.x += -1;
+            newPoint.x += -.8f;
             unit.gameObject.GetComponent<Movement>().MoveUnit(newPoint);
             i++;
             Debug.Log(offset);
@@ -44,7 +44,7 @@ public class MovementManager : MonoBehaviour {
             if(i%unitsInLine == 0 && SelectionManager.main.GetSelectedUnits().Count > 3)
             {
                 newPoint.x = point.x;
-                newPoint.z -= 2;
+                newPoint.z -= .8f;
                 offset = 1;
             }
         }

@@ -34,8 +34,8 @@ public class Movement : MonoBehaviour {
 
     public void MoveUnit(Vector3 point)
     {
+        transform.LookAt(point);
         agent.SetDestination(point);
         unit.SetState(state.MOVING);
-        Debug.Log(unit.GetState());
     }
 }

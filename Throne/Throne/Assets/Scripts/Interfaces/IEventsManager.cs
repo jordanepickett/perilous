@@ -5,4 +5,5 @@ public interface IEventsManager
 {
 
     event MouseActions MouseClick;
+    event ScreenEdgeActions ScreenEdgeMousePosition;
 }
