@@ -4,11 +4,13 @@ using UnityEngine;
 
 public delegate void MouseActions(object sender);
 public delegate void MouseSelection(Bounds viewPortBounds);
+public delegate void RightMouseClick(Vector3 hit);
 
 public partial class EventsManager : MonoBehaviour, IEventsManager {
 
     public event MouseActions MouseClick;
     public event MouseSelection MouseSelection;
+    public event RightMouseClick RightMouseClick;
 
     public static EventsManager main;
 

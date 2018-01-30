@@ -52,7 +52,6 @@ public class SelectableUnit : MonoBehaviour {
             selectionCircle = Instantiate(SelectionManager.main.TeamSelectionPrefab);
             selectionCircle.transform.SetParent(transform, false);
             selectionCircle.transform.eulerAngles = new Vector3(90, 0, 0);
-            Debug.Log("HERE");
         }
         else
         {
