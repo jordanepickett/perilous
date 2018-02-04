@@ -1,13 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class MainCameraTest : MonoBehaviour {
+public class MainCameraTest : NetworkBehaviour {
 
     //outside of the update loop
-    float cameraMovementSpeed = 10f;
+    float cameraMovementSpeed = 15f;
     int scrollBorder = 10; // instead of the gui-rect-components
     Vector3 movement = Vector3.zero;
+
+    void Start()
+    {
+
+    }
 
     private void Update()
     {

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class SelectionManager : MonoBehaviour {
 
@@ -20,6 +21,7 @@ public class SelectionManager : MonoBehaviour {
 	void Start () {
         main = this;
         EventsManager.main.MouseSelection += SelectUnits;
+
 	}
 	
 	// Update is called once per frame
@@ -61,7 +63,7 @@ public class SelectionManager : MonoBehaviour {
         var camera = Camera.main;
         if(viewPortBounds.min.x == viewPortBounds.max.x && viewPortBounds.min.y == viewPortBounds.max.y)
         {
-            if(Utils.SingleMouseClick() && Utils.SingleMouseClick().name == gameObject.name)
+            if(Utils.SingleMouseClick() && Utils.SingleMouseClick().GetComponent<NetworkIdentity>() == gameObject.GetComponent<NetworkIdentity>())
             {
                 return true;
             }
