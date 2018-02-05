@@ -14,6 +14,14 @@ public partial class EventsManager
         {
             isSelecting = true;
             mousePosition1 = Input.mousePosition;
+
+
+            RaycastHit hit = new RaycastHit();
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
+            {
+                if (LeftMouseClick != null)
+                    LeftMouseClick(hit.point);
+            }
         }
         // If we let go of the left mouse button, end selection
         if (Input.GetMouseButtonUp(0))

@@ -66,7 +66,6 @@ public static class Utils {
 
     public static GameObject SingleMouseClick()
     {
-        Debug.Log("Mouse is down");
 
         RaycastHit hitInfo = new RaycastHit();
         bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
@@ -75,12 +74,10 @@ public static class Utils {
             Debug.Log("Hit " + hitInfo.transform.gameObject.name);
             if (hitInfo.transform.gameObject.GetComponent<SelectableUnit>())
             {
-                Debug.Log("It's working!");
                 return hitInfo.transform.gameObject;
             }
             else
             {
-                Debug.Log("nopz");
                 return null;
             }
         }

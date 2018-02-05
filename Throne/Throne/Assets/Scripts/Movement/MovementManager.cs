@@ -29,17 +29,17 @@ public class MovementManager : MonoBehaviour {
         int unitsInLine = (int)Mathf.Sqrt(SelectionManager.main.GetSelectedUnits().Count);
         int i = 0;
         int offset = 1;
+        Debug.Log(point);
         foreach (var unit in units)
         {
-            if(SelectionManager.main.GetSelectedUnits().Count == 1)
+            if (SelectionManager.main.GetSelectedUnits().Count == 1)
             {
-                unit.gameObject.GetComponent<Movement>().MoveUnit(newPoint);
+                unit.gameObject.GetComponent<Unit>().Command(Commands.CreateMoveOrder(point));
                 break;
             }
             newPoint.x += -.8f;
-            unit.gameObject.GetComponent<Movement>().MoveUnit(newPoint);
+            unit.gameObject.GetComponent<Unit>().Command(Commands.CreateMoveOrder(newPoint));
             i++;
-            Debug.Log(offset);
             offset--;
             if(i%unitsInLine == 0 && SelectionManager.main.GetSelectedUnits().Count > 3)
             {

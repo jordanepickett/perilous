@@ -6,6 +6,8 @@ public class GameManager : NetworkBehaviour
 {
     public GameObject spawnPrefab;
 
+    private Faction playerFaction;
+
     public override void OnStartLocalPlayer()
     {
         //I kept this part in, because I don't know if this is the function that sets isLocalPlayer to true, 
@@ -21,6 +23,7 @@ public class GameManager : NetworkBehaviour
     {
         if (GetComponent<NetworkView>().isMine)
             MainCamera.main.enabled = true;
+      
         else
             MainCamera.main.enabled = false;
     }
@@ -47,7 +50,6 @@ public class GameManager : NetworkBehaviour
             {
                 GameObject obj = MonoBehaviour.Instantiate(this.spawnPrefab) as GameObject;
                 NetworkServer.SpawnWithClientAuthority(obj, this.connectionToClient);
-                Debug.Log("TEST");
             }
         }
         else

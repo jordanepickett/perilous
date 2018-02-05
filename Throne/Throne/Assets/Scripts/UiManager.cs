@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,12 +7,13 @@ using UnityEngine.UI;
 public class UiManager : MonoBehaviour {
 
     public GameObject prefab;
-
-    public int numberToCreate;
+    private List<GameObject> UnitPanel = new List<GameObject>();
+    private SelectableUnit firstUnit;
 
 	// Use this for initialization
 	void Start () {
-        Populate();
+        //UnitCommands();
+        SelectionManager.main.FirstUnitChanged += CheckFirstUnit;
 	}
 	
 	// Update is called once per frame
@@ -19,14 +21,34 @@ public class UiManager : MonoBehaviour {
 		
 	}
 
-    private void Populate()
+    private void UnitCommands()
     {
         GameObject newObj;
-
-        for(int i = 0; i < numberToCreate; i++)
+        foreach (UnitCommands command in Enum.GetValues(typeof(UnitCommands)))
         {
-            newObj = (GameObject)Instantiate(prefab, transform);
-            newObj.GetComponent<Image>().color = Random.ColorHSV();
+            if(command == global::UnitCommands.Move)
+            {
+                newObj = (GameObject)Instantiate(prefab, transform);
+                UnitPanel.Add(newObj);
+            }
+        }
+    }
+
+    private void CheckFirstUnit()
+    {
+        if(firstUnit == null || firstUnit.GetComponent<RtsObject>().unitType != SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType)
+        {
+            firstUnit = SelectionManager.main.FirstUnit();
+            ClearUnitPanel();
+            UnitCommands();
+        }
+    }
+
+    private void ClearUnitPanel()
+    {
+        foreach(GameObject command in UnitPanel)
+        {
+            Destroy(command);
         }
     }
 }

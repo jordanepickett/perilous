@@ -13,7 +13,7 @@ public enum state
     DEAD
 }
 
-public class Unit : MonoBehaviour {
+public class Unit : RtsObject {
 
     protected state State;
 
@@ -36,4 +36,23 @@ public class Unit : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    public override void Command(Command command)
+    {
+        switch(command.UnitCommand)
+        {
+            case (UnitCommands.Move):
+                if(IsMoveable())
+                {
+                    MoveCommand(command);
+                }
+                break;
+        }
+
+    }
+
+    void MoveCommand(Command command)
+    {
+        GetComponent<Movement>().MoveUnit(command.Location);
+    }
 }

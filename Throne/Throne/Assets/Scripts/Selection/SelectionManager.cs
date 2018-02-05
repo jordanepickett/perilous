@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+public delegate void FirstUnitChanged();
+
 public class SelectionManager : MonoBehaviour {
 
     public GameObject TeamSelectionPrefab;
@@ -12,14 +14,25 @@ public class SelectionManager : MonoBehaviour {
 
     private List<SelectableUnit> selectedUnits = new List<SelectableUnit>();
 
+    public event FirstUnitChanged FirstUnitChanged;
+
     public List<SelectableUnit> GetSelectedUnits()
     {
         return selectedUnits;
     }
 
-	// Use this for initialization
-	void Start () {
+    public SelectableUnit FirstUnit()
+    {
+        return selectedUnits[0];
+    }
+
+    private void Awake()
+    {
         main = this;
+    }
+
+    // Use this for initialization
+    void Start () {
         EventsManager.main.MouseSelection += SelectUnits;
 
 	}
@@ -55,6 +68,7 @@ public class SelectionManager : MonoBehaviour {
             {
                 selectableObject.ChangeSelectionStatus(true);
             }
+            FirstUnitChanged();
         }
     }
 

@@ -49,6 +49,7 @@ public class Movement : NetworkBehaviour {
         unit.SetState(state.MOVING);
 
         CmdSetTarget(point);
+        Debug.Log(point);
     }
 
     [Command]
