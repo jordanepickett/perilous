@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Networking;
 
+public delegate void PositionReached();
 
 public class Movement : NetworkBehaviour {
 
@@ -12,6 +13,8 @@ public class Movement : NetworkBehaviour {
     public float speed;
     public float turnSpeed;
     public float acceleration;
+
+    public event PositionReached PositionReached;
 
 	// Use this for initialization
 	void Start () {
@@ -49,12 +52,21 @@ public class Movement : NetworkBehaviour {
         unit.SetState(state.MOVING);
 
         CmdSetTarget(point);
-        Debug.Log(point);
     }
 
     [Command]
     public void CmdSetTarget(Vector3 point)
     {
 
+    }
+
+    public void Hold()
+    {
+        if (!this.hasAuthority)
+        {
+            return;
+        }
+        agent.SetDestination(this.transform.position);
+        unit.SetState(state.IDLE);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections.Generic;
+using System;
 
 public class GameManager : NetworkBehaviour
 {
@@ -8,11 +9,18 @@ public class GameManager : NetworkBehaviour
 
     private Faction playerFaction;
 
+    public static GameManager main;
+
     public override void OnStartLocalPlayer()
     {
         //I kept this part in, because I don't know if this is the function that sets isLocalPlayer to true, 
         //or this function triggers after isLocalPlayer is set to true.
         base.OnStartLocalPlayer();
+        main = this;
+
+        playerFaction = gameObject.AddComponent<FactionA>();
+        playerFaction = GetComponent<Faction>();
+        playerFaction.SetName("Human");
 
         //On initialization, make the client (local client and remote clients) tell the server to call on an [ClientRpc] method.
         CmdCall();
@@ -22,10 +30,13 @@ public class GameManager : NetworkBehaviour
     void OnNetworkInstantiate(NetworkMessageInfo info)
     {
         if (GetComponent<NetworkView>().isMine)
+        {
             MainCamera.main.enabled = true;
-      
+        }
         else
+        {
             MainCamera.main.enabled = false;
+        }
     }
 
     [Command]
@@ -49,6 +60,7 @@ public class GameManager : NetworkBehaviour
             for(int i = 0; i < 3; i++)
             {
                 GameObject obj = MonoBehaviour.Instantiate(this.spawnPrefab) as GameObject;
+                obj.GetComponent<RtsObject>().Team = Team.One;
                 NetworkServer.SpawnWithClientAuthority(obj, this.connectionToClient);
             }
         }

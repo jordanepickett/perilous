@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public abstract class RtsObject : MonoBehaviour {
+public abstract class RtsObject : NetworkBehaviour {
 
     public UnitType unitType;
 
@@ -10,6 +11,12 @@ public abstract class RtsObject : MonoBehaviour {
     {
         get;
         private set;
+    }
+
+    public Team Team
+    {
+        get;
+        set;
     }
 
     [SerializeField]
@@ -27,5 +34,5 @@ public abstract class RtsObject : MonoBehaviour {
         return isAttackable;
     }
 
-    public abstract void Command(Command command);
+    public abstract void Command(Icommand command);
 }

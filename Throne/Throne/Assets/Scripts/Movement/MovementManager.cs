@@ -14,7 +14,7 @@ public class MovementManager : MonoBehaviour {
 
     void Start()
     {
-        EventsManager.main.RightMouseClick += GiveMovementCommand;
+
     }
 	
 	// Update is called once per frame
@@ -22,28 +22,27 @@ public class MovementManager : MonoBehaviour {
 		
 	}
 
-    public void GiveMovementCommand(Vector3 point)
+    public void GiveMovementCommand(MoveCommand command)
     {
         var units = SelectionManager.main.GetSelectedUnits();
-        var newPoint = point;
+        var newPoint = command.GetPoint();
         int unitsInLine = (int)Mathf.Sqrt(SelectionManager.main.GetSelectedUnits().Count);
         int i = 0;
         int offset = 1;
-        Debug.Log(point);
         foreach (var unit in units)
         {
             if (SelectionManager.main.GetSelectedUnits().Count == 1)
             {
-                unit.gameObject.GetComponent<Unit>().Command(Commands.CreateMoveOrder(point));
+                unit.gameObject.GetComponent<Unit>().Command(command);
                 break;
             }
-            newPoint.x += -.8f;
-            unit.gameObject.GetComponent<Unit>().Command(Commands.CreateMoveOrder(newPoint));
+            command.SetXPoint(newPoint.x += -.8f);
+            unit.gameObject.GetComponent<Unit>().Command(command);
             i++;
             offset--;
             if(i%unitsInLine == 0 && SelectionManager.main.GetSelectedUnits().Count > 3)
             {
-                newPoint.x = point.x;
+                newPoint.x = command.GetPoint().x;
                 newPoint.z -= .8f;
                 offset = 1;
             }

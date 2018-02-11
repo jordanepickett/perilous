@@ -3,11 +3,7 @@
     Move,
     Hold,
     Attack,
-    Patrol
-}
-
-public enum WorkerCommands
-{
+    Patrol,
     Repair,
     Build
 }

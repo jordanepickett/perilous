@@ -56,6 +56,16 @@ public class SelectionManager : MonoBehaviour {
             }
             if (IsWithinSelectionBounds(selectableObject.gameObject, viewPortBounds))
             {
+                foreach(var pot in potentialUnits)
+                {
+                    if(pot.GetComponent<Unit>().unitType == UnitType.Infantry || pot.GetComponent<Unit>().unitType == UnitType.Infantry)
+                    {
+                        if(selectableObject.GetComponent<Unit>().unitType == UnitType.Building)
+                        {
+                            break;
+                        }
+                    }
+                }
                 potentialUnits.Add(selectableObject);
                 i++;
             }

@@ -1,41 +1,35 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Command {
-    
-    public UnitCommands UnitCommand
+public abstract class Command {
+
+    protected UnitCommands unitCommand;
+
+    protected KeyCode keyBind;
+
+    protected GameObject Unit;
+
+    public void SetUnit(GameObject newUnit)
     {
-        get;
-        private set;
+        Unit = newUnit;
     }
 
-    public Vector3 Location
+    public KeyCode GetKeyBind()
     {
-        get;
-        private set;
+        return keyBind;
     }
 
-    public RtsObject RtsObject
+    public void SetKeyBind(KeyCode newKeyBind)
     {
-        get;
-        private set;
+        keyBind = newKeyBind;
     }
 
-    public Command(UnitCommands command)
-    {
-        UnitCommand = command;
-    }
+    protected Vector3 point;
 
-    public Command(UnitCommands command, Vector3 location)
+    public Vector3 GetPoint()
     {
-        UnitCommand = command;
-        Location = location;
-    }
-
-    public Command(UnitCommands command, RtsObject obj)
-    {
-        UnitCommand = command;
-        RtsObject = obj;
+        return point;
     }
 }

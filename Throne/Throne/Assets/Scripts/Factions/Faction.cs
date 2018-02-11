@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Faction {
+public class Faction : MonoBehaviour {
+
+    [SerializeField]
+    protected List<Item> buildings;
 
     private string name;
 
@@ -14,5 +17,10 @@ public class Faction {
     public void SetName(string newName)
     {
         name = newName;
+    }
+
+    public List<Item> GetBuildableBuildings()
+    {
+        return buildings;
     }
 }

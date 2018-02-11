@@ -23,6 +23,9 @@ public class Infantry : Unit {
                 break;
             case state.WORKING:
                 break;
+            case state.BUILDING:
+                Debug.Log("BUILDING");
+                break;
         }
 	}
 }
