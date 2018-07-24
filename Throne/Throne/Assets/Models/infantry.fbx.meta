@@ -1,0 +1,166 @@
+fileFormatVersion: 2
+guid: 7fac6796722945a48905527d8234450c
+timeCreated: 1527971065
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Armature
+    100002: Bone
+    100004: Bone.001
+    100006: Bone.002
+    100008: Bone.003
+    100010: Bone.003_end
+    100012: Camera
+    100014: Cube
+    100016: Cube.001
+    100018: Cube.002
+    100020: Empty
+    100022: Foot.L
+    100024: Foot.L_end
+    100026: Foot.R
+    100028: Foot.R_end
+    100030: Hand.L
+    100032: Hand.L_end
+    100034: Hand.R
+    100036: Hand.R_end
+    100038: //RootNode
+    100040: Lamp
+    100042: Leg IK.L
+    100044: Leg IK.L_end
+    100046: Leg IK.R
+    100048: Leg IK.R_end
+    100050: Lower Arm.L
+    100052: Lower Arm.R
+    100054: Lower Leg.L
+    100056: Lower Leg.R
+    100058: Point
+    100060: Pole Target.L
+    100062: Pole Target.L_end
+    100064: Pole Target.R
+    100066: Pole Target.R_end
+    100068: Shoulder.L
+    100070: Shoulder.R
+    100072: Upper Arm.L
+    100074: Upper Arm.R
+    100076: Upper Leg.L
+    100078: Upper Leg.R
+    400000: Armature
+    400002: Bone
+    400004: Bone.001
+    400006: Bone.002
+    400008: Bone.003
+    400010: Bone.003_end
+    400012: Camera
+    400014: Cube
+    400016: Cube.001
+    400018: Cube.002
+    400020: Empty
+    400022: Foot.L
+    400024: Foot.L_end
+    400026: Foot.R
+    400028: Foot.R_end
+    400030: Hand.L
+    400032: Hand.L_end
+    400034: Hand.R
+    400036: Hand.R_end
+    400038: //RootNode
+    400040: Lamp
+    400042: Leg IK.L
+    400044: Leg IK.L_end
+    400046: Leg IK.R
+    400048: Leg IK.R_end
+    400050: Lower Arm.L
+    400052: Lower Arm.R
+    400054: Lower Leg.L
+    400056: Lower Leg.R
+    400058: Point
+    400060: Pole Target.L
+    400062: Pole Target.L_end
+    400064: Pole Target.R
+    400066: Pole Target.R_end
+    400068: Shoulder.L
+    400070: Shoulder.R
+    400072: Upper Arm.L
+    400074: Upper Arm.R
+    400076: Upper Leg.L
+    400078: Upper Leg.R
+    2300000: Cube
+    2300002: Cube.002
+    3300000: Cube
+    3300002: Cube.002
+    4300000: Cube.002
+    4300002: Cube.001
+    4300004: Cube
+    9500000: //RootNode
+    13700000: Cube.001
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

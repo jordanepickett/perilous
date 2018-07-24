@@ -7,7 +7,26 @@ public abstract class RtsObject : NetworkBehaviour {
 
     public UnitType unitType;
 
-	public string Name
+    protected bool isDeployed;
+
+    private Item item;
+
+    public Item GetItem()
+    {
+        return item;
+    }
+
+    public void SetItem(Item item)
+    {
+        this.item = item;
+    }
+
+    public bool IsDeployed()
+    {
+        return isDeployed;
+    }
+
+    public string Name
     {
         get;
         private set;
@@ -20,9 +39,16 @@ public abstract class RtsObject : NetworkBehaviour {
     }
 
     [SerializeField]
-    private bool isMovable;
+    protected bool isMovable;
     [SerializeField]
-    private bool isAttackable;
+    protected bool isAttackable;
+    [SerializeField]
+    protected bool isInteractable;
+
+    public bool IsInteractable()
+    {
+        return isInteractable;
+    }
 
     public bool IsMoveable()
     {
@@ -34,5 +60,10 @@ public abstract class RtsObject : NetworkBehaviour {
         return isAttackable;
     }
 
-    public abstract void Command(Icommand command);
+    public abstract void Command(Icommand command, bool addToQueue = true);
+
+    public virtual void DisplayPanel()
+    {
+        UiManager.main.ClearUnitPanel();
+    }
 }

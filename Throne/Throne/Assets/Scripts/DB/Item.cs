@@ -17,6 +17,7 @@ public class Item
     public float RotationSpeed = 0;
     public float Acceleration = 0;
     public KeyCode keyBind;
+    public int BuildingId = 0;
 
     public GameObject Prefab;
 
@@ -120,6 +121,7 @@ public class Item
         Speed = item.Speed;
         RotationSpeed = item.RotationSpeed;
         Prefab = item.Prefab;
+        BuildingId = item.BuildingId;
         Cost = item.Cost;
         BuildTime = item.BuildTime;
         TypeIdentifier = item.TypeIdentifier;

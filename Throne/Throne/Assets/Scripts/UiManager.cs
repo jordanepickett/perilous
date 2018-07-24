@@ -64,18 +64,39 @@ public class UiManager : MonoBehaviour {
         }
     }
 
+    public void BuildingCommands()
+    {
+        isBuildingPanelOpen = true;
+        GameObject newObj;
+
+        foreach (var item in GameManager.main.gameObject.GetComponent<Faction>().GetBuildableBuildings())
+        {
+            if(item.BuildingId == firstUnit.GetComponent<RtsObject>().GetItem().ID)
+            {
+                newObj = (GameObject)Instantiate(prefab, transform);
+                BuildCommand buildCommand = new BuildCommand(item.keyBind);
+                buildCommand.SetUnit(item.Prefab);
+                newObj.GetComponent<CommandUiSender>().SetCommand(buildCommand);
+                newObj.GetComponent<Image>().sprite = item.ItemImage;
+                item.Prefab.GetComponent<RtsObject>().SetItem(item);
+                UnitPanel.Add(BtnDecorator.BuildDecorate(newObj));
+            }
+        }
+    }
+
     public void CheckFirstUnit()
     {
         if(firstUnit == null || firstUnit.GetComponent<RtsObject>().unitType != SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType || isBuildingPanelOpen == true)
         {
             firstUnit = SelectionManager.main.FirstUnit();
             ClearUnitPanel();
-            UnitCommands();
+            firstUnit.GetComponent<RtsObject>().DisplayPanel();
             isBuildingPanelOpen = false;
         }
+       
     }
 
-    private void ClearUnitPanel()
+    public void ClearUnitPanel()
     {
         foreach(GameObject command in UnitPanel)
         {
@@ -91,12 +112,16 @@ public class UiManager : MonoBehaviour {
 
         foreach(var item in GameManager.main.gameObject.GetComponent<Faction>().GetBuildableBuildings())
         {
-            newObj = (GameObject)Instantiate(prefab, transform);
-            BuildCommand buildCommand = new BuildCommand(item.keyBind);
-            buildCommand.SetUnit(item.Prefab);
-            newObj.GetComponent<CommandUiSender>().SetCommand(buildCommand);
-            newObj.GetComponent<Image>().sprite = item.ItemImage;
-            UnitPanel.Add(BtnDecorator.BuildDecorate(newObj));
+            if(item.TypeIdentifier == UnitType.Building)
+            {
+                newObj = (GameObject)Instantiate(prefab, transform);
+                BuildCommand buildCommand = new BuildCommand(item.keyBind);
+                buildCommand.SetUnit(item.Prefab);
+                newObj.GetComponent<CommandUiSender>().SetCommand(buildCommand);
+                newObj.GetComponent<Image>().sprite = item.ItemImage;
+                item.Prefab.GetComponent<RtsObject>().SetItem(item);
+                UnitPanel.Add(BtnDecorator.BuildDecorate(newObj));
+            }
         }
 
         //newObj = (GameObject)Instantiate(prefab, transform);

@@ -16,15 +16,26 @@ public class BuildCommand : Command, Icommand
 
     public BuildCommand(KeyCode keyBind)
     {
-        EventsManager.main.LeftMouseClick += TryToBuild;
-        EventsManager.main.RightMouseClick += CancelTryToBuild;
+        if(SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType == UnitType.Worker)
+        {
+            EventsManager.main.LeftMouseClick += TryToBuild;
+            EventsManager.main.RightMouseClick += CancelTryToBuild;
+        }
         unitCommand = UnitCommands.Build;
         SetKeyBind(keyBind);
     }
 
     public void InitializeCommand()
     {
-        ReadyUpCommand();
+        if (SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType == UnitType.Building)
+        {
+            isReadyForPlacement = true;
+            TryToBuild(new Vector3(0, 0, 0));
+        }
+        else
+        {
+            ReadyUpCommand();
+        }
     }
 
     void ReadyUpCommand()
@@ -37,6 +48,11 @@ public class BuildCommand : Command, Icommand
         {
             isReadyForPlacement = true;
         }
+        if(isReadyForPlacement == true)
+        {
+            //MouseManager.main.SetBuildingTobePlaced(GetUnit());
+            MouseManager.main.SetState(MouseState.BUILDING_PLACEMENT);
+        }
     }
 
     public void KeyBindCommand()
@@ -46,12 +62,38 @@ public class BuildCommand : Command, Icommand
 
     private void TryToBuild(Vector3 potentialPlacement)
     {
-        if(isReadyForPlacement == true)
+        if(SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType == UnitType.Worker)
         {
-            this.point = potentialPlacement;
-            SelectionManager.main.FirstUnit().gameObject.GetComponent<Unit>().Command(this);
-            UiManager.main.CheckFirstUnit();
-            isReadyForPlacement = false;
+            if (isReadyForPlacement == true)
+            {
+                this.point = potentialPlacement;
+                SelectionManager.main.FirstUnit().gameObject.GetComponent<Unit>().Command(this);
+                UiManager.main.CheckFirstUnit();
+                isReadyForPlacement = false;
+                //changed this
+                MouseManager.main.SetState(MouseState.DEFAULT);
+            }
+        }
+        else
+        {
+            if (isReadyForPlacement == true)
+            {
+                Debug.Log("IM HERE NOW");
+                Vector3 playerPos = new Vector3(SelectionManager.main.FirstUnit().transform.position.x,
+                    SelectionManager.main.FirstUnit().transform.position.y + 3,
+                    SelectionManager.main.FirstUnit().transform.position.z);
+                Vector3 playerDirection = SelectionManager.main.FirstUnit().transform.forward;
+                Quaternion playerRotation = SelectionManager.main.FirstUnit().transform.rotation;
+                float spawnDistance = 1;
+
+                Vector3 spawnPos = playerPos + playerDirection * spawnDistance;
+                this.point = spawnPos;
+                SelectionManager.main.FirstUnit().gameObject.GetComponent<Unit>().Command(this);
+                UiManager.main.CheckFirstUnit();
+                isReadyForPlacement = false;
+                //changed this
+                MouseManager.main.SetState(MouseState.DEFAULT);
+            }
         }
     }
 
