@@ -5,71 +5,30 @@ using System;
 
 public class GameManager : NetworkBehaviour
 {
-    public GameObject spawnPrefab;
+    public Dictionary<int, PlayerController> players = new Dictionary<int, PlayerController>();
 
-    private Faction playerFaction;
+    public List<Faction> factions = new List<Faction>();
 
     public static GameManager main;
 
-    public override void OnStartLocalPlayer()
+    void Awake()
     {
-        //I kept this part in, because I don't know if this is the function that sets isLocalPlayer to true, 
-        //or this function triggers after isLocalPlayer is set to true.
-        base.OnStartLocalPlayer();
+        var playerFaction = gameObject.AddComponent<FactionA>();
+        factions.Add(playerFaction);
         main = this;
-
-        playerFaction = gameObject.AddComponent<FactionA>();
-        playerFaction = GetComponent<Faction>();
-        playerFaction.SetName("Human");
-
-        //On initialization, make the client (local client and remote clients) tell the server to call on an [ClientRpc] method.
-        CmdCall();
-
+        DontDestroyOnLoad(gameObject);
     }
 
-    void OnNetworkInstantiate(NetworkMessageInfo info)
+    public Dictionary<int, PlayerController> AddPlayer(int id, PlayerController player)
     {
-        if (GetComponent<NetworkView>().isMine)
-        {
-            MainCamera.main.enabled = true;
-        }
-        else
-        {
-            MainCamera.main.enabled = false;
-        }
+        players.Add(id, player);
+
+        return players;
     }
 
-    [Command]
-    public void CmdCall()
+    public PlayerController GetPlayer(int id)
     {
-        //Calling [ClientRpc] on the server.
-        RpcLog();
-    }
-
-    [ClientRpc]
-    public void RpcLog()
-    {
-        //First, checks to see what type of recipient is receiving this message. If it's server, the output message should tell the user what the type is.
-        Debug.Log("RPC: This is " + (this.isServer ? " Server" : " Client"));
-
-        if (this.isServer)
-        {
-            //Server code
-            //This is run for spawning new non-player objects. Since it is a server calling to all clients (local and remote), it needs to pass in a
-            //NetworkConnection that connects from server to THAT PARTICULAR client, who is going to own client authority on the spawned object.
-            for(int i = 0; i < 3; i++)
-            {
-                GameObject obj = MonoBehaviour.Instantiate(this.spawnPrefab) as GameObject;
-                obj.GetComponent<RtsObject>().Team = Team.One;
-                NetworkServer.SpawnWithClientAuthority(obj, this.connectionToClient);
-            }
-        }
-        else
-        {
-            //Client code
-            //I realized this hardly runs. Placed a log message here for completeness.
-            Debug.Log("Testing.");
-        }
+        return players[id];
     }
 }
 

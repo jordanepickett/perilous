@@ -69,7 +69,7 @@ public class UiManager : MonoBehaviour {
         isBuildingPanelOpen = true;
         GameObject newObj;
 
-        foreach (var item in GameManager.main.gameObject.GetComponent<Faction>().GetBuildableBuildings())
+        foreach (var item in firstUnit.GetComponent<FactionA>().GetBuildableBuildings())
         {
             if(item.BuildingId == firstUnit.GetComponent<RtsObject>().GetItem().ID)
             {
@@ -110,7 +110,7 @@ public class UiManager : MonoBehaviour {
         ClearUnitPanel();
         GameObject newObj;
 
-        foreach(var item in GameManager.main.gameObject.GetComponent<Faction>().GetBuildableBuildings())
+        foreach(var item in firstUnit.GetComponent<FactionA>().GetBuildableBuildings())
         {
             if(item.TypeIdentifier == UnitType.Building)
             {

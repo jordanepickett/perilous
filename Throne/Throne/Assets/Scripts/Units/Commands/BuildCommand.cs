@@ -78,7 +78,6 @@ public class BuildCommand : Command, Icommand
         {
             if (isReadyForPlacement == true)
             {
-                Debug.Log("IM HERE NOW");
                 Vector3 playerPos = new Vector3(SelectionManager.main.FirstUnit().transform.position.x,
                     SelectionManager.main.FirstUnit().transform.position.y + 3,
                     SelectionManager.main.FirstUnit().transform.position.z);

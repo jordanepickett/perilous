@@ -23,60 +23,16 @@ Platform assembly: E:\GitHub\perilous\Throne\Throne\Server\test2.0_Data\Managed\
 Loading E:\GitHub\perilous\Throne\Throne\Server\test2.0_Data\Managed\websocket-sharp.dll into Unity Child Domain
 Platform assembly: E:\GitHub\perilous\Throne\Throne\Server\test2.0_Data\Managed\BarebonesLogger.dll (this message is harmless)
 Loading E:\GitHub\perilous\Throne\Throne\Server\test2.0_Data\Managed\BarebonesLogger.dll into Unity Child Domain
-- Completed reload, in  0.021 seconds
+- Completed reload, in  0.019 seconds
 Platform assembly: E:\GitHub\perilous\Throne\Throne\Server\test2.0_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: E:\GitHub\perilous\Throne\Throne\Server\test2.0_Data\Managed\System.dll (this message is harmless)
+Shader 'MicroSplat/Terrain': dependency 'AddPassShader' shader 'Hidden/MicroSplat/AddPass' not found
 desktop: 1920x1080 120Hz; virtual: 3520x1080 at -1600,0
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 0.970873 ms
+Shader 'MicroSplat/Example': dependency 'AddPassShader' shader 'Hidden/MicroSplat/AddPass' not found
+UnloadTime: 1.005017 ms
 Setting up 2 worker threads for Enlighten.
-  Thread -> id: 149c -> priority: 1 
-  Thread -> id: 2700 -> priority: 1 
-Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 4.305128 ms
-
-Unloading 6 unused Assets to reduce memory usage. Loaded Objects now: 854.
-Total: 0.659150 ms (FindLiveObjects: 0.040672 ms CreateObjectMapping: 0.050608 ms MarkObjects: 0.533716 ms  DeleteObjects: 0.033842 ms)
-
-Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 0.647352 ms
-
-Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 877.
-Total: 0.508567 ms (FindLiveObjects: 0.028253 ms CreateObjectMapping: 0.030427 ms MarkObjects: 0.444608 ms  DeleteObjects: 0.004967 ms)
-
-Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 0.445850 ms
-
-Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 854.
-Total: 0.501737 ms (FindLiveObjects: 0.023907 ms CreateObjectMapping: 0.042535 ms MarkObjects: 0.431878 ms  DeleteObjects: 0.003415 ms)
-
-Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 0.529990 ms
-
-Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 877.
-Total: 0.486213 ms (FindLiveObjects: 0.026390 ms CreateObjectMapping: 0.037257 ms MarkObjects: 0.409524 ms  DeleteObjects: 0.012729 ms)
-
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-Log: connection {1} has been disconnected by timeout; address {::ffff:192.168.0.22:64944}
-ServerDisconnected due to error: Timeout
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-Log: connection {1} has been disconnected by timeout; address {::ffff:192.168.0.22:58044}
-ServerDisconnected due to error: Timeout
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 0.297751 ms
-
-Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 855.
-Total: 0.468515 ms (FindLiveObjects: 0.023907 ms CreateObjectMapping: 0.028874 ms MarkObjects: 0.411697 ms  DeleteObjects: 0.003725 ms)
-
+  Thread -> id: 5c64 -> priority: 1 
+  Thread -> id: 3d7c -> priority: 1 

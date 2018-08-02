@@ -50,6 +50,7 @@ public static class FactionABuildings {
         Name = "Peasant",
         Health = 25.0f,
         Armour = 0.0f,
+        Damage = 1,
         Prefab = Resources.Load("Models/FactionA/Units/Humanoids/Peasant/Peasant", typeof(GameObject)) as GameObject,
         ItemImage = Resources.Load("Item Images/FactionA/Units/Humanoids/Peasant/Peasant", typeof(Sprite)) as Sprite,
         SortOrder = 0,

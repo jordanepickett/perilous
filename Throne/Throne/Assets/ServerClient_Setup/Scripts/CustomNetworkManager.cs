@@ -4,12 +4,14 @@ using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
 using UnityEngine.UI;
 using System;
+using System.Collections.Generic;
 
 public class CustomNetworkManager : NetworkManager
 {
     public Text clientsInfoText;
     public ClientHUD clientHudScript;
     public ServerHUD serverHudScript;
+    public List<GameObject> players = new List<GameObject>();
 
     private int connectedClients = 0;
 
@@ -34,6 +36,10 @@ public class CustomNetworkManager : NetworkManager
         base.OnServerConnect(conn);
         connectedClients += 1;
         clientsInfoText.text = "Connected Clients : " + connectedClients;
+        Color newColor = new Color(UnityEngine.Random.Range(0.0f, 1.0f), UnityEngine.Random.Range(0.0f, 1.0f), UnityEngine.Random.Range(0.0f, 1.0f));
+        players.Add(playerPrefab);
+        playerPrefab.GetComponent<PlayerController>().teamId = connectedClients;
+        playerPrefab.GetComponent<PlayerController>().color = newColor;
 
         //Sending password information to client.
         StringMessage msg = new StringMessage(serverPassword);

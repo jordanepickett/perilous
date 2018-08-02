@@ -6,7 +6,11 @@ public class FactionA : Faction {
 
     private void Awake()
     {
-        FactionABuildings.Initialise();
+        SetBuildings();
+    }
+
+    public void SetBuildings()
+    {
         buildings = FactionABuildings.GetAllBuildings();
     }
 }

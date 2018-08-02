@@ -12,7 +12,7 @@ public class Infantry : Unit {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
         switch (State)
         {
             case state.IDLE:

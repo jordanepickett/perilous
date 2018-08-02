@@ -7,18 +7,23 @@ public abstract class RtsObject : NetworkBehaviour {
 
     public UnitType unitType;
 
+    public Factions faction;
+
     protected bool isDeployed;
 
     private Item item;
+
+    public NetworkConnection conn;
 
     public Item GetItem()
     {
         return item;
     }
 
-    public void SetItem(Item item)
+    public void SetItem(Item newItem)
     {
-        this.item = item;
+        item = newItem;
+        Debug.Log(item.Name);
     }
 
     public bool IsDeployed()
@@ -32,14 +37,8 @@ public abstract class RtsObject : NetworkBehaviour {
         private set;
     }
 
-    public Team Team
-    {
-        get;
-        set;
-    }
-
     [SerializeField]
-    protected bool isMovable;
+    public bool isMovable;
     [SerializeField]
     protected bool isAttackable;
     [SerializeField]

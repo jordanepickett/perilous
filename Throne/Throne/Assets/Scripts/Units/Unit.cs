@@ -28,6 +28,7 @@ public class Unit : RtsObject {
     protected state State;
 
     public event StateChanged StateChanged;
+    public GameManager manager;
 
     private int id;
 
@@ -60,6 +61,7 @@ public class Unit : RtsObject {
     // Use this for initialization
     void Awake () {
         Initialized();
+        gameObject.AddComponent<FactionA>();
     }
 
     protected virtual void Initialized()
@@ -67,6 +69,7 @@ public class Unit : RtsObject {
         CheckQueue += CheckCommandQueue;
         StateChanged += OnChangedStates;
         SetState(state.IDLE);
+
     }
 
     protected virtual void OnChangedStates(state newState)
@@ -131,7 +134,6 @@ public class Unit : RtsObject {
                         if(addToQueue)
                         {
                             queueCommands.Add(command);
-                            Debug.Log(queueCommands.Count + " COMMANDS");
                         }
                     }
                     break;
@@ -183,27 +185,31 @@ public class Unit : RtsObject {
     {
         if (this.isServer)
         {
-            GameObject prefab = NetworkManager.singleton.spawnPrefabs[id];
-            GameObject obj = Instantiate(prefab, new Vector3(point.x, point.y - 3, point.z), Quaternion.Euler(0, -210, 0)) as GameObject;
-            obj.GetComponent<RtsObject>().Team = Team.One;
-            NetworkServer.SpawnWithClientAuthority(obj, GameManager.main.connectionToClient);
-            obj.GetComponent<Unit>().DeployPlacement();
-
-            foreach(var item in GameManager.main.gameObject.GetComponent<Faction>().GetBuildableBuildings())
+            GameObject prefab = CustomNetworkManager.singleton.spawnPrefabs[id];
+            if(unitType == UnitType.Building)
             {
-                if(id == item.ID)
-                {
-                    obj.GetComponent<RtsObject>().SetItem(item);
-                }
+                Vector3 newPoint = CheckSpawnPoint(point);
+                point = newPoint;
             }
+            GameObject obj = Instantiate(prefab, new Vector3(point.x, point.y - 3, point.z), Quaternion.Euler(0, -210, 0)) as GameObject;
+            obj.GetComponent<RtsObjectController>().teamId = GetComponent<RtsObjectController>().teamId;
+            NetworkServer.SpawnWithClientAuthority(obj, conn);
+            obj.GetComponent<RtsObjectController>().itemId = id;
+            obj.GetComponent<RtsObjectController>().color = GetComponent<RtsObjectController>().color;
+            obj.GetComponent<RtsObject>().conn = this.conn;
+            obj.GetComponent<RtsObjectController>().SetPlayer(GetComponent<RtsObjectController>().GetPlayer());
+
+            RpcBuildBuilding(obj);
+
+            obj.GetComponent<Unit>().DeployPlacement();
         }
-        RpcBuildBuilding();
     }
 
     [ClientRpc]
-    public void RpcBuildBuilding()
+    public void RpcBuildBuilding(GameObject obj)
     {
         SetState(state.BUILDING);
+        obj.GetComponent<Unit>().DeployPlacement();
     }
 
     public IEnumerator AtBuildingPlacement(Vector3 buildingPlacement, bool atDestination)
@@ -251,6 +257,25 @@ public class Unit : RtsObject {
         {
             Debug.Log(q.ToString());
         }
+    }
+
+    private Vector3 CheckSpawnPoint(Vector3 point)
+    {
+        float radius = 3.0f;
+        var hitColliders = Physics.OverlapSphere(point, 1);
+        if (hitColliders.Length > 0)
+        {
+            foreach(var collider in hitColliders)
+            {
+                if(collider.gameObject.name == "Terrain")
+                {
+                    continue;
+                }
+                Debug.Log(collider);
+                return CheckSpawnPoint(new Vector3(point.x + 0.1f, point.y, point.z));
+            }
+        }
+        return point;
     }
 
 }
