@@ -11,7 +11,7 @@ public enum state
     ATTACKING,
     STUNNED,
     SLOWED,
-    WORKING,
+    GATHERING,
     BUILDING,
     DEPLOYING,
     DEAD
@@ -38,6 +38,8 @@ public class Unit : RtsObject {
     protected float timeToReachTarget;
     protected List<Icommand> queueCommands = new List<Icommand>();
     protected event CheckQueue CheckQueue;
+
+    protected int buildSeconds;
 
     public state GetState()
     {
@@ -81,10 +83,12 @@ public class Unit : RtsObject {
                 isInteractable = true;
                 break;
             case state.MOVING:
+                break;
+            case state.GATHERING:
+                break;
+            case state.ATTACKING:
                 isMovable = true;
                 isInteractable = true;
-                break;
-            case state.WORKING:
                 break;
             case state.BUILDING:
                 isMovable = false;
@@ -111,12 +115,14 @@ public class Unit : RtsObject {
 
     public override void Command(Icommand command, bool addToQueue = true)
     {
+        Debug.Log(command.GetUnitCommand());
         if (isInteractable)
         {
             switch (command.GetUnitCommand())
             {
                 case (UnitCommands.Move):
-                    if (IsMoveable())
+                   
+                    if (isMovable)
                     {
                         MoveCommand(command);
                     }
@@ -127,6 +133,9 @@ public class Unit : RtsObject {
                         HoldCommand();
                     }
                     break;
+                case (UnitCommands.Attack):
+                    GetComponent<UnitAttack>().SetTarget(command.GetUnit());
+                    break;
                 case (UnitCommands.Build):
                     if (this.unitType == UnitType.Worker || this.unitType == UnitType.Building)
                     {
@@ -135,6 +144,12 @@ public class Unit : RtsObject {
                         {
                             queueCommands.Add(command);
                         }
+                    }
+                    break;
+                case (UnitCommands.Gather):
+                    if(unitType == UnitType.Worker)
+                    {
+                        GatherCommand(command);
                     }
                     break;
             }
@@ -158,8 +173,11 @@ public class Unit : RtsObject {
         {
             return;
         }
+        SetState(state.BUILDING);
+        Debug.Log("BUILDING STATE SET");
         bool atDestination = true;
         this.command = command;
+        CmdBuildSeconds((int)command.GetUnit().GetComponent<Unit>().GetItem().BuildTime);
         if(this.unitType == UnitType.Worker)
         {
             if (transform.position != command.GetPoint())
@@ -181,6 +199,12 @@ public class Unit : RtsObject {
     }
 
     [Command]
+    void CmdBuildSeconds(int seconds)
+    {
+        buildSeconds = seconds;
+    }
+
+    [Command]
     public void CmdBuildBuilding(int id, Vector3 point)
     {
         if (this.isServer)
@@ -193,23 +217,23 @@ public class Unit : RtsObject {
             }
             GameObject obj = Instantiate(prefab, new Vector3(point.x, point.y - 3, point.z), Quaternion.Euler(0, -210, 0)) as GameObject;
             obj.GetComponent<RtsObjectController>().teamId = GetComponent<RtsObjectController>().teamId;
-            NetworkServer.SpawnWithClientAuthority(obj, conn);
             obj.GetComponent<RtsObjectController>().itemId = id;
             obj.GetComponent<RtsObjectController>().color = GetComponent<RtsObjectController>().color;
+            obj.GetComponent<RtsObjectController>().ParentObject = gameObject;
             obj.GetComponent<RtsObject>().conn = this.conn;
             obj.GetComponent<RtsObjectController>().SetPlayer(GetComponent<RtsObjectController>().GetPlayer());
-
+            NetworkServer.SpawnWithClientAuthority(obj, conn);
             RpcBuildBuilding(obj);
 
-            obj.GetComponent<Unit>().DeployPlacement();
+            //SetState(state.BUILDING);
+            //obj.GetComponent<Unit>().DeployPlacement();
         }
     }
 
     [ClientRpc]
     public void RpcBuildBuilding(GameObject obj)
     {
-        SetState(state.BUILDING);
-        obj.GetComponent<Unit>().DeployPlacement();
+        //obj.GetComponent<Unit>().DeployPlacement();
     }
 
     public IEnumerator AtBuildingPlacement(Vector3 buildingPlacement, bool atDestination)
@@ -219,7 +243,8 @@ public class Unit : RtsObject {
             yield return null;
         }
         CmdBuildBuilding(command.GetUnit().GetComponent<RtsObject>().GetItem().ID, command.GetPoint());
-        GetComponent<Movement>().Hold();
+        GetComponent<Movement>().Hold(state.BUILDING);
+        Debug.Log("HOLD");
     }
 
     public virtual void Deploying()
@@ -235,27 +260,43 @@ public class Unit : RtsObject {
         yield return new WaitForSeconds(seconds);
         gameObject.GetComponent<Renderer>().enabled = true;
         SetState(state.IDLE);
+        GetComponent<RtsObjectController>().GetPlayer().GetComponent<PlayerUnitController>().AddUnit(gameObject);
     }
 
-    protected IEnumerator BuildingLength(float seconds)
+    public IEnumerator BuildingLength(float seconds)
     {
+        isMovable = false;
+        isInteractable = false;
+        gameObject.GetComponent<Renderer>().enabled = false;
         yield return new WaitForSeconds(seconds);
         gameObject.GetComponent<Renderer>().enabled = true;
+        Debug.Log("SECONDS" + seconds);
         SetState(state.IDLE);
         CheckQueue();
     }
 
     protected void CheckCommandQueue()
     {
-        queueCommands.RemoveAt(0);
         if(queueCommands.Count > 0)
         {
-            Command(queueCommands[0], false);
-        }
+            queueCommands.RemoveAt(0);
+            if (queueCommands.Count > 0)
+            {
+                Command(queueCommands[0], false);
+            }
 
-        foreach(var q in queueCommands)
+            foreach (var q in queueCommands)
+            {
+                Debug.Log(q.ToString());
+            }
+        }
+    }
+
+    void GatherCommand(Icommand command)
+    {
+        if(GetComponent<UnitGather>())
         {
-            Debug.Log(q.ToString());
+            GetComponent<UnitGather>().Gather(command);
         }
     }
 
@@ -276,6 +317,16 @@ public class Unit : RtsObject {
             }
         }
         return point;
+    }
+
+    public void TakeDamage(int[] damageInfo)
+    {
+        health -= damageInfo[0];
+        if(health <= 0)
+        {
+            health = 0;
+            NetworkServer.Destroy(gameObject);
+        }
     }
 
 }

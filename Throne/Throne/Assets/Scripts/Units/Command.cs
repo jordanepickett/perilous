@@ -32,4 +32,9 @@ public abstract class Command {
     {
         return point;
     }
+
+    public void SetPoint(Vector3 point)
+    {
+        this.point = point;
+    }
 }

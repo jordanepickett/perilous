@@ -50,7 +50,7 @@ public class BuildCommand : Command, Icommand
         }
         if(isReadyForPlacement == true)
         {
-            //MouseManager.main.SetBuildingTobePlaced(GetUnit());
+            MouseManager.main.SetBuildingTobePlaced(GetUnit());
             MouseManager.main.SetState(MouseState.BUILDING_PLACEMENT);
         }
     }
@@ -99,6 +99,7 @@ public class BuildCommand : Command, Icommand
     private void CancelTryToBuild(Vector3 point)
     {
         isReadyForPlacement = false;
+        MouseManager.main.SetState(MouseState.DEFAULT);
     }
 
     public GameObject GetUnit()

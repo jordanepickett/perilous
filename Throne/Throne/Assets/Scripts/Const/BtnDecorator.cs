@@ -16,6 +16,16 @@ public static class BtnDecorator {
             case (UnitCommands.Hold):
                 obj.GetComponent<Button>().GetComponentInChildren<Text>().text = "Stop";
                 break;
+            case (UnitCommands.Attack):
+                obj.GetComponent<Button>().GetComponentInChildren<Text>().text = "Attack";
+                break;
+            case (UnitCommands.Gather):
+                obj.GetComponent<Button>().GetComponentInChildren<Text>().text = "Gather";
+                break;
+            default:
+                obj.GetComponent<Button>().GetComponentInChildren<Text>().text = "NI";
+                break;
+
         }
 
         return obj;

@@ -8,6 +8,9 @@ public interface Icommand {
     UnitCommands GetUnitCommand();
     KeyCode GetKeyBind();
     Vector3 GetPoint();
+    void SetPoint(Vector3 point);
     GameObject GetUnit();
+    void SetUnit(GameObject newUnit);
+
     void KeyBindCommand();
 }

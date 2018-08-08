@@ -56,12 +56,16 @@ public class MouseManager : MonoBehaviour {
             case MouseState.MOVE:
                 break;
             case MouseState.BUILDING_PLACEMENT:
-                RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit, 1000))
+           
+                Ray ray = GetComponent<EventsManager>().gameCamera.ScreenPointToRay(Input.mousePosition);
+                //Plane plane = new Plane(Vector3.up, new Vector3(0,1.5f,0));
+
+                RaycastHit hitInfo;
+                if (Physics.Raycast(ray, out hitInfo))
                 {
-                    buildingToBePlaced.transform.position = hit.point;
-                    //Debug.Log(buildingToBePlaced.transform.position);
+                    //Vector3 point = ray.GetPoint(rayDistance);
+                    buildingToBePlaced.transform.position = new Vector3(
+                        Mathf.Round(hitInfo.point.x), hitInfo.point.y, Mathf.Round(hitInfo.point.z));
                 }
                 break;
         }
@@ -72,14 +76,15 @@ public class MouseManager : MonoBehaviour {
         switch (newState)
         {
             case MouseState.DEFAULT:
-                //Destroy(buildingToBePlaced);
+                Destroy(buildingToBePlaced);
                 break;
             case MouseState.ATTACK:
                 break;
             case MouseState.MOVE:
                 break;
             case MouseState.BUILDING_PLACEMENT:
-                //Instantiate(buildingToBePlaced);
+                GameObject placement = (GameObject)Resources.Load("Placement") as GameObject;
+                buildingToBePlaced = Instantiate(placement);
                 break;
         }
     }

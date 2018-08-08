@@ -6,12 +6,16 @@ using UnityEngine.Networking;
 public class MainCameraTest : NetworkBehaviour {
 
     //outside of the update loop
-    float cameraMovementSpeed = 15f;
+    float cameraMovementSpeed = 35f;
     int scrollBorder = 10; // instead of the gui-rect-components
     Vector3 movement = Vector3.zero;
     bool staticCamera = false;
 
-    void Start()
+    public int teamId;
+
+    public PlayerController player;
+
+    void Awake()
     {
 
     }

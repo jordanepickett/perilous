@@ -31,20 +31,23 @@ public class MovementManager : MonoBehaviour {
         int offset = 1;
         foreach (var unit in units)
         {
-            if (SelectionManager.main.GetSelectedUnits().Count == 1)
+            if(unit.GetComponent<Unit>().unitType != UnitType.Building)
             {
+                if (SelectionManager.main.GetSelectedUnits().Count == 1)
+                {
+                    unit.gameObject.GetComponent<Unit>().Command(command);
+                    break;
+                }
+                command.SetXPoint(newPoint.x += -.8f);
                 unit.gameObject.GetComponent<Unit>().Command(command);
-                break;
-            }
-            command.SetXPoint(newPoint.x += -.8f);
-            unit.gameObject.GetComponent<Unit>().Command(command);
-            i++;
-            offset--;
-            if(i%unitsInLine == 0 && SelectionManager.main.GetSelectedUnits().Count > 3)
-            {
-                newPoint.x = command.GetPoint().x;
-                newPoint.z -= .8f;
-                offset = 1;
+                i++;
+                offset--;
+                if (i % unitsInLine == 0 && SelectionManager.main.GetSelectedUnits().Count > 3)
+                {
+                    newPoint.x = command.GetPoint().x;
+                    newPoint.z -= .8f;
+                    offset = 1;
+                }
             }
         }
     }

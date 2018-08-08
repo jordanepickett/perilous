@@ -34,7 +34,7 @@ public class Movement : NetworkBehaviour {
         if (unit.GetState() == state.MOVING)
         {
             float dist = agent.remainingDistance;
-            if (agent.remainingDistance == 0)
+            if (agent.remainingDistance <= 0.1f)
             {
                 unit.SetState(state.IDLE);
             }
@@ -43,7 +43,8 @@ public class Movement : NetworkBehaviour {
 
     public void MoveUnit(Vector3 point)
     {
-        CmdSetTarget(point);
+        if (!isServer)
+            CmdSetTarget(point);
     }
 
     public void UnitMove(Vector3 point)
@@ -52,7 +53,10 @@ public class Movement : NetworkBehaviour {
         {
             transform.LookAt(point);
             agent.SetDestination(point);
-            unit.SetState(state.MOVING);
+            if(unit.GetState() == state.IDLE)
+            {
+                unit.SetState(state.MOVING);
+            }
         }
     }
 
@@ -69,27 +73,30 @@ public class Movement : NetworkBehaviour {
         UnitMove(point);
     }
 
-    public void Hold()
+    public void Hold(state previousState = state.IDLE)
     {
-        CmdHold();
+        if (!isServer)
+        {
+            CmdHold((int)previousState);
+            HoldUnit((int)previousState);
+        }
     }
 
     [Command]
-    public void CmdHold()
+    public void CmdHold(int previousStateId)
     {
-        HoldUnit();
-        RpcHold();
+        HoldUnit(previousStateId);
     }
 
     [ClientRpc]
-    public void RpcHold()
+    public void RpcHold(int previousStateId)
     {
-        HoldUnit();
+        HoldUnit(previousStateId);
     }
 
-    public void HoldUnit()
+    public void HoldUnit(int previousStateId)
     {
         agent.SetDestination(this.transform.position);
-        unit.SetState(state.IDLE);
+        unit.SetState((state)previousStateId);
     }
 }

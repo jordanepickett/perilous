@@ -18,6 +18,9 @@ public class RtsObjectController : NetworkBehaviour
     [SyncVar(hook = "OnTeam")]
     public int teamId;
 
+    [SyncVar]
+    public GameObject ParentObject;
+
     public Team Team
     {
         get; set;
@@ -31,6 +34,8 @@ public class RtsObjectController : NetworkBehaviour
     [SyncVar(hook = "OnDamage")]
     public int damage;
 
+    [SerializeField]
+    [SyncVar(hook = "OnPlayer")]
     private GameObject player;
 
     public GameObject GetPlayer()
@@ -40,22 +45,19 @@ public class RtsObjectController : NetworkBehaviour
 
     public void SetPlayer(GameObject newPlayer)
     {
-        if(isServer)
-        {
-            RpcAddPlayerToUnit(newPlayer);
-            player = newPlayer;
-        }
+        Debug.Log("WE ARE THE SERVER");
+        player = newPlayer;
+    }
+
+    void OnPlayer(GameObject obj)
+    {
+        player = obj;
     }
 
     private void Awake()
     {
-        gameObject.AddComponent<UnitAttack>();
-    }
-
-    [ClientRpc]
-    public void RpcAddPlayerToUnit(GameObject player)
-    {
-        GetComponent<RtsObjectController>().SetPlayer(player);
+        //TODO: THIS NEEDS TO BE CHANGED
+        //gameObject.AddComponent<UnitAttack>();
     }
 
     public void OnItem(int itemId)
@@ -86,7 +88,13 @@ public class RtsObjectController : NetworkBehaviour
                 GetComponent<RtsObject>().SetItem(item);
                 if(isServer)
                 {
-                    damage = (int)item.Damage;
+                    damage = (int)item.attack.damage;
+                }
+                GetComponent<Unit>().DeployPlacement();
+                if(ParentObject && 
+                    (ParentObject.GetComponent<Unit>().unitType == UnitType.Worker || (ParentObject.GetComponent<Unit>().unitType == UnitType.Building)))
+                {
+                    StartCoroutine(ParentObject.GetComponent<Unit>().BuildingLength(GetComponent<RtsObject>().GetItem().BuildTime));
                 }
             }
         }
@@ -169,12 +177,28 @@ public class RtsObjectController : NetworkBehaviour
     public void SetUnitAttack(int damage)
     {
         Debug.Log("SETTING DAMAGE " + damage);
+        UnitAttack unitAttack = GetComponent<UnitAttack>();
+        RtsObject obj = GetComponent<RtsObject>();
         //GetComponent<UnitAttack>().DamageType = (DamageType)damage;
-        GetComponent<UnitAttack>().Damage = damage;
+        unitAttack.damage = damage;
+        unitAttack.piercingDamage = obj.GetItem().attack.piercingDamage;
+        unitAttack.range = obj.GetItem().attack.range;
+        unitAttack.attackSpeed = obj.GetItem().attack.attackSpeed;
+        unitAttack.damageType = obj.GetItem().attack.damageType;
+        unitAttack.DamageType = (DamageType)unitAttack.damageType;
     }
 
     public override void OnStartClient()
     {
         SetColor(color);
+    }
+
+    public bool isSameTeam(RtsObjectController objController)
+    {
+        if(objController.teamId != GetComponent<RtsObjectController>().teamId)
+        {
+            return false;
+        }
+        return true;
     }
 }

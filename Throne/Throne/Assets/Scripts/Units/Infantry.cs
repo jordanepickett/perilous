@@ -12,7 +12,7 @@ public class Infantry : Unit {
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () {
         switch (State)
         {
             case state.IDLE:
@@ -21,7 +21,11 @@ public class Infantry : Unit {
             case state.MOVING:
                 //Debug.Log("Moving");
                 break;
-            case state.WORKING:
+            case state.GATHERING:
+                break;
+            case state.ATTACKING:
+                GetComponent<UnitAttack>().Attack();
+                //Building();
                 break;
             case state.BUILDING:
                 Debug.Log("BUILDING");
@@ -29,7 +33,6 @@ public class Infantry : Unit {
                 break;
             case state.DEPLOYING:
                 Debug.Log("DEPLOYING");
-                Deploying();
                 break;
         }
 	}
@@ -41,6 +44,7 @@ public class Infantry : Unit {
 
     protected override void OnChangedStates(state newState)
     {
+        Debug.Log(newState);
         switch (State)
         {
             case state.IDLE:
@@ -48,16 +52,19 @@ public class Infantry : Unit {
                 isInteractable = true;
                 break;
             case state.MOVING:
+                break;
+            case state.GATHERING:
+                break;
+            case state.ATTACKING:
                 isMovable = true;
                 isInteractable = true;
                 break;
-            case state.WORKING:
-                break;
             case state.BUILDING:
+                break;
+            case state.DEPLOYING:
                 isMovable = false;
                 isInteractable = false;
-                gameObject.GetComponent<Renderer>().enabled = false;
-                StartCoroutine(BuildingLength(5f));
+                Deploying();
                 break;
         }
     }

@@ -19,6 +19,8 @@ public class Item
     public KeyCode keyBind;
     public int BuildingId = 0;
 
+    public Attack attack;
+
     public GameObject Prefab;
 
     public int Cost;

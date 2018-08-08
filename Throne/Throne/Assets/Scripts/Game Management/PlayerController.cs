@@ -9,7 +9,13 @@ public class PlayerController : NetworkBehaviour
 
     private Faction playerFaction;
 
-    private int gold, lumber;
+    [SerializeField]
+    [SyncVar(hook = "OnGold")]
+    public int gold;
+
+    [SerializeField]
+    [SyncVar(hook = "OnLumber")]
+    public int lumber;
 
     [SerializeField]
     [SyncVar(hook = "OnTeam")]
@@ -37,9 +43,29 @@ public class PlayerController : NetworkBehaviour
         gold -= goldAmount;
     }
 
+    public int Lumber()
+    {
+        return lumber;
+    }
+
+    public void AddLumber(int lumberAmount)
+    {
+        Debug.Log(lumberAmount);
+        lumber += lumberAmount;
+    }
+
+    public void RemoveLumber(int lumberAmout)
+    {
+        lumber -= lumber;
+    }
+
     public Faction GetFaction()
     {
         return playerFaction;
+    }
+
+    private void Awake()
+    {
     }
 
     public override void OnStartLocalPlayer()
@@ -100,7 +126,6 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     public void RpcLog(int factionId)
     {
-
     }
 
     public void OnTeam(int teamId)
@@ -124,6 +149,27 @@ public class PlayerController : NetworkBehaviour
     public void SetTeam(int teamId)
     {
         Team = (Team)teamId;
+    }
+
+    public void OnGold(int amount)
+    {
+        gold += amount;
+        Debug.Log("GOLD AMOUNT  = " + amount);
+    }
+
+    public void OnLumber(int amount)
+    {
+        lumber += amount;
+        Debug.Log("LUMBER AMOUNT = " + amount);
+    }
+
+    void OnGUI()
+    {
+        int TextWidth = 100;
+        GUI.Box(new Rect(Screen.width - TextWidth, 10, TextWidth, 55), "Current Gold");
+        GUI.Box(new Rect(Screen.width - TextWidth, 40, TextWidth, 55), gold.ToString());
+        GUI.Box(new Rect(Screen.width - TextWidth, 100, TextWidth, 55), "Current Lumber");
+        GUI.Box(new Rect(Screen.width - TextWidth, 130, TextWidth, 55), lumber.ToString());
     }
 }
 

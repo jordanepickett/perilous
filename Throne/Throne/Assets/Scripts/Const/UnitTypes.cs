@@ -7,12 +7,9 @@
 
 public enum BuildingType
 {
-    Main,
-    Support,
-    Build_Small,
-    Build_Medium,
-    Build_Advance,
-    Build_Air
+    MAIN,
+    FARM,
+    BARRACKS
 }
 
 public enum Team

@@ -24,7 +24,11 @@ public static class FactionABuildings {
         Cost = 700,
         BuildingId = 0,
         BuildTime = 10.0f,
-        keyBind = KeyCode.Q
+        keyBind = KeyCode.Q,
+        attack = new Attack
+        {
+
+        }
     };
 
     public static Item Barracks = new Item
@@ -40,7 +44,11 @@ public static class FactionABuildings {
         Cost = 700,
         BuildingId = 0,
         BuildTime = 10.0f,
-        keyBind = KeyCode.W
+        keyBind = KeyCode.W,
+        attack = new Attack
+        {
+
+        }
     };
 
     public static Item Peasant = new Item
@@ -50,14 +58,17 @@ public static class FactionABuildings {
         Name = "Peasant",
         Health = 25.0f,
         Armour = 0.0f,
-        Damage = 1,
         Prefab = Resources.Load("Models/FactionA/Units/Humanoids/Peasant/Peasant", typeof(GameObject)) as GameObject,
         ItemImage = Resources.Load("Item Images/FactionA/Units/Humanoids/Peasant/Peasant", typeof(Sprite)) as Sprite,
         SortOrder = 0,
         Cost = 100,
         BuildingId = 3,
         BuildTime = 5.0f,
-        keyBind = KeyCode.Q
+        keyBind = KeyCode.Q,
+        attack = new Attack {
+            damage = 1,
+            range = 1,
+        }
     };
 
     public static void Initialise()

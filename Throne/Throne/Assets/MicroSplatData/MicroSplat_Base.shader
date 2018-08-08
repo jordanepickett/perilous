@@ -8,7 +8,7 @@
 //   Platform : WindowsEditor
 //////////////////////////////////////////////////////
 
-Shader "Hidden/MicroSplat/Terrain_Base1472582563" {
+Shader "Hidden/MicroSplat/Terrain_Base-1985293227" {
    Properties {
       [HideInInspector] _Control0 ("Control0", 2D) = "red" {}
       [HideInInspector] _Control1 ("Control1", 2D) = "black" {}
@@ -47,6 +47,7 @@ Shader "Hidden/MicroSplat/Terrain_Base1472582563" {
       #define _PERTEXCONTRAST 1
       #define _PERTEXNORMSTR 1
       #define _PERTEXSMOOTHSTR 1
+      #define _PERTEXUVSCALEOFFSET 1
 
 
       #include "UnityCG.cginc"

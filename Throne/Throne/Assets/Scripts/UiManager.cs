@@ -13,6 +13,14 @@ public class UiManager : MonoBehaviour {
 
     public bool isBuildingPanelOpen = false;
 
+    private List<Icommand> unitCommands = new List<Icommand>();
+    public List<Icommand> GetUnitCommands()
+    {
+        return unitCommands;
+    }
+
+    private Icommand openBuildCommand;
+
     public static UiManager main;
 
     private void Awake()
@@ -24,45 +32,70 @@ public class UiManager : MonoBehaviour {
     void Start () {
         //UnitCommands();
         SelectionManager.main.FirstUnitChanged += CheckFirstUnit;
-	}
+        InitializeCommands();
+    }
 	
 	// Update is called once per frame
 	void Update () {
-		
 	}
 
     public void UnitCommands()
     {
-        GameObject newObj;
-        foreach (UnitCommands command in Enum.GetValues(typeof(UnitCommands)))
+        Debug.Log(SelectionManager.main.FirstUnit().GetComponent<Unit>().IsInteractable());
+        if(SelectionManager.main.FirstUnit().GetComponent<Unit>().IsInteractable())
         {
-            if(command == global::UnitCommands.Move)
+            GameObject newObj;
+            foreach (var command in unitCommands)
             {
                 newObj = (GameObject)Instantiate(prefab, transform);
-                newObj.GetComponent<CommandUiSender>().SetCommand(new MoveCommand());
+                newObj.GetComponent<CommandUiSender>().SetCommand(command);
                 UnitPanel.Add(BtnDecorator.Decorate(newObj));
+            }
+
+            if (firstUnit.GetComponent<RtsObject>().unitType == UnitType.Worker)
+            {
+                newObj = (GameObject)Instantiate(prefab, transform);
+                newObj.GetComponent<CommandUiSender>().SetCommand(openBuildCommand);
+                UnitPanel.Add(BtnDecorator.BuildDecorate(newObj));
+            }
+        }
+    }
+
+    void InitializeCommands()
+    {
+        foreach (UnitCommands command in Enum.GetValues(typeof(UnitCommands)))
+        {
+            if (command == global::UnitCommands.Move)
+            {
+                MoveCommand unitCommand = new MoveCommand();
+                unitCommands.Add(unitCommand);
+
             }
             if (command == global::UnitCommands.Hold)
             {
-                newObj = (GameObject)Instantiate(prefab, transform);
-                newObj.GetComponent<CommandUiSender>().SetCommand(new StopCommand());
-                UnitPanel.Add(BtnDecorator.Decorate(newObj));
+                StopCommand unitCommand = new StopCommand();
+                unitCommands.Add(unitCommand);
             }
-            if(command == global::UnitCommands.Build || command == global::UnitCommands.Repair && firstUnit.GetComponent<RtsObject>().unitType == UnitType.Worker)
+            if (command == global::UnitCommands.Attack)
             {
-                newObj = (GameObject)Instantiate(prefab, transform);
-                newObj.GetComponent<CommandUiSender>().SetCommand(new MoveCommand());
-                UnitPanel.Add(BtnDecorator.Decorate(newObj));
+                AttackCommand unitCommand = new AttackCommand();
+                unitCommands.Add(unitCommand);
             }
+            if (command == global::UnitCommands.Gather)
+            {
+                GatherCommand unitCommand = new GatherCommand();
+                unitCommands.Add(unitCommand);
+            }
+            // if (command == global::UnitCommands.Build || command == global::UnitCommands.Repair && firstUnit.GetComponent<RtsObject>().unitType == UnitType.Worker)
+            // {
+            //newObj = (GameObject)Instantiate(prefab, transform);
+            //newObj.GetComponent<CommandUiSender>().SetCommand(new MoveCommand());
+            //UnitPanel.Add(BtnDecorator.Decorate(newObj));
+            //}
         }
 
-        if(firstUnit.GetComponent<RtsObject>().unitType == UnitType.Worker)
-        {
-            newObj = (GameObject)Instantiate(prefab, transform);
-            newObj.GetComponent<CommandUiSender>().SetCommand(new OpenBuildCommand());
-            UnitPanel.Add(BtnDecorator.BuildDecorate(newObj));
-        }
-    }
+        openBuildCommand = new OpenBuildCommand();
+    } 
 
     public void BuildingCommands()
     {
@@ -86,7 +119,7 @@ public class UiManager : MonoBehaviour {
 
     public void CheckFirstUnit()
     {
-        if(firstUnit == null || firstUnit.GetComponent<RtsObject>().unitType != SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType || isBuildingPanelOpen == true)
+        if(firstUnit == null || firstUnit.GetComponent<RtsObject>().gameObject != SelectionManager.main.FirstUnit().GetComponent<RtsObject>().gameObject || isBuildingPanelOpen == true)
         {
             firstUnit = SelectionManager.main.FirstUnit();
             ClearUnitPanel();

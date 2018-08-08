@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class Building : Unit {
 
-
+    public BuildingType buildingType;
 
     public override void DeployPlacement()
     {
         SetState(state.DEPLOYING);
         startPosition = transform.position;
         target = new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z);
-        timeToReachTarget = 5f;
+        timeToReachTarget = GetItem().BuildTime;
         isMovable = false;
     }
 
@@ -21,13 +21,12 @@ public class Building : Unit {
         switch (State)
         {
             case state.IDLE:
-                //Debug.Log("Idle");
                 isInteractable = true;
                 break;
             case state.MOVING:
                 Debug.Log("Moving");
                 break;
-            case state.WORKING:
+            case state.GATHERING:
                 break;
             case state.BUILDING:
                 break;
@@ -48,12 +47,15 @@ public class Building : Unit {
             case state.MOVING:
                 isInteractable = true;
                 break;
-            case state.WORKING:
+            case state.GATHERING:
                 break;
             case state.BUILDING:
                 isMovable = false;
                 isInteractable = true;
-                StartCoroutine(BuildingLength(5f));
+                break;
+            case state.DEPLOYING:
+                isMovable = false;
+                isInteractable = false;
                 break;
         }
     }
@@ -65,6 +67,7 @@ public class Building : Unit {
         if(transform.position == target)
         {
             SetState(state.IDLE);
+            GetComponent<RtsObjectController>().GetPlayer().GetComponent<PlayerUnitController>().AddUnit(gameObject);
         }
     }
 

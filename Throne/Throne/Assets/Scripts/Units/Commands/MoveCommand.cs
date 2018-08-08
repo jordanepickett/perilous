@@ -59,6 +59,7 @@ public class MoveCommand : Command, Icommand {
 
     void GiveMovementCommand(Vector3 point)
     {
+        Debug.Log("MOVE COMMAND");
         this.point = point;
         MovementManager.main.GiveMovementCommand(this);
     }

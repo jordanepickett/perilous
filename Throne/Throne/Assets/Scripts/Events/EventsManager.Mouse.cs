@@ -7,6 +7,10 @@ public partial class EventsManager
     bool isSelecting = false;
     Vector3 mousePosition1;
 
+    public void Start()
+    {
+        gameCamera = Camera.main.GetComponent<Camera>();
+    }
     public void CheckMouseClicks()
     {
         // If we press the left mouse button, save mouse location and begin selection
@@ -54,12 +58,21 @@ public partial class EventsManager
         //    }
         //}
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonUp(1))
         {
             RaycastHit hit = new RaycastHit();
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
             {
-                RightMouseClick(hit.point);
+                if (hit.collider.gameObject.tag == "Ground")
+                {
+                    Debug.Log("GROUND HIT");
+                    RightMouseClick(hit.point);
+                }
+                else
+                {
+                    Debug.Log("FUUUUUUUUUCK");
+                    RightMouseClickObject(hit);
+                }
             }
         }
     }

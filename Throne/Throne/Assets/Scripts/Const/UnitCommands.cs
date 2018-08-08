@@ -5,6 +5,7 @@
     Attack,
     Patrol,
     Repair,
+    Gather,
     Build
 }
 

@@ -11,6 +11,10 @@ public abstract class RtsObject : NetworkBehaviour {
 
     protected bool isDeployed;
 
+    [SerializeField]
+    [SyncVar(hook = "OnHealthChange")]
+    public int health;
+
     private Item item;
 
     public NetworkConnection conn;
@@ -23,7 +27,7 @@ public abstract class RtsObject : NetworkBehaviour {
     public void SetItem(Item newItem)
     {
         item = newItem;
-        Debug.Log(item.Name);
+        health = (int)newItem.Health;
     }
 
     public bool IsDeployed()
@@ -64,5 +68,10 @@ public abstract class RtsObject : NetworkBehaviour {
     public virtual void DisplayPanel()
     {
         UiManager.main.ClearUnitPanel();
+    }
+
+    public void OnHealthChange(int health)
+    {
+        Debug.Log(health);
     }
 }

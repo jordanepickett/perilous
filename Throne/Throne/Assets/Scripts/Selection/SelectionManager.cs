@@ -8,13 +8,14 @@ public delegate void FirstUnitChanged();
 public class SelectionManager : MonoBehaviour {
 
     public GameObject TeamSelectionPrefab;
-
+    
     public static SelectionManager main;
     public static int MAX_SELECTION = 12;
 
     private List<SelectableUnit> selectedUnits = new List<SelectableUnit>();
 
     public event FirstUnitChanged FirstUnitChanged;
+
 
     public List<SelectableUnit> GetSelectedUnits()
     {
@@ -46,6 +47,7 @@ public class SelectionManager : MonoBehaviour {
     {
         //ClearSelectedUnits();
         List<SelectableUnit> potentialUnits = new List<SelectableUnit>();
+        List<int> indexes = new List<int>();
 
         int i = 0;
         foreach (var selectableObject in FindObjectsOfType<SelectableUnit>())
@@ -54,15 +56,23 @@ public class SelectionManager : MonoBehaviour {
             {
                 break;
             }
+
+            if(selectableObject.GetComponent<RtsObjectController>() && selectedUnits.Count > 0)
+            {
+                if (FirstUnit().GetComponent<RtsObjectController>().teamId != selectableObject.GetComponent<RtsObjectController>().teamId)
+                {
+                    continue;
+                }
+            }
             if (IsWithinSelectionBounds(selectableObject.gameObject, viewPortBounds))
             {
                 foreach(var pot in potentialUnits)
                 {
-                    if(pot.GetComponent<Unit>().unitType == UnitType.Infantry || pot.GetComponent<Unit>().unitType == UnitType.Infantry)
+                    if(pot.GetComponent<Unit>().unitType == UnitType.Infantry || pot.GetComponent<Unit>().unitType == UnitType.Worker)
                     {
                         if(selectableObject.GetComponent<Unit>().unitType == UnitType.Building)
                         {
-                            break;
+
                         }
                     }
                 }
@@ -103,5 +113,13 @@ public class SelectionManager : MonoBehaviour {
             selectedUnit.GetComponent<SelectableUnit>().ChangeSelectionStatus(false);
         }
         selectedUnits.Clear();
+    }
+
+    public void GiveAllUnitsCommand(Icommand command)
+    {
+        foreach(var unit in selectedUnits)
+        {
+            unit.gameObject.GetComponent<Unit>().Command(command, false);
+        }
     }
 }
