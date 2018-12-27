@@ -21,6 +21,8 @@ public class MouseManager : MonoBehaviour {
     [SerializeField]
     private GameObject buildingToBePlaced;
 
+    public bool isMainBuilding = false;
+
     public void SetBuildingTobePlaced(GameObject building)
     {
         buildingToBePlaced = building;
@@ -64,8 +66,9 @@ public class MouseManager : MonoBehaviour {
                 if (Physics.Raycast(ray, out hitInfo))
                 {
                     //Vector3 point = ray.GetPoint(rayDistance);
+                    var terrainHeight = Terrain.activeTerrain.SampleHeight(hitInfo.point);
                     buildingToBePlaced.transform.position = new Vector3(
-                        Mathf.Round(hitInfo.point.x), hitInfo.point.y, Mathf.Round(hitInfo.point.z));
+                        Mathf.Round(hitInfo.point.x), terrainHeight + 0.3f, Mathf.Round(hitInfo.point.z));
                 }
                 break;
         }
@@ -83,9 +86,28 @@ public class MouseManager : MonoBehaviour {
             case MouseState.MOVE:
                 break;
             case MouseState.BUILDING_PLACEMENT:
-                GameObject placement = (GameObject)Resources.Load("Placement") as GameObject;
+                //GameObject placement = (GameObject)Resources.Load("Placement") as GameObject;
+                GameObject placement = (GameObject)buildingToBePlaced;
                 buildingToBePlaced = Instantiate(placement);
                 break;
         }
+    }
+
+    public bool IsLegalPosition()
+    {
+        if(!buildingToBePlaced)
+        {
+            return false;
+        }
+        if(buildingToBePlaced.GetComponentInChildren<PlacementTrigger>().GetColliders().Count > 0)
+        {
+            return false;
+        }
+        if (buildingToBePlaced.GetComponentInChildren<PlacementTrigger>().isMainBuilding == true &&
+            buildingToBePlaced.GetComponentInChildren<PlacementTrigger>().closeToMines == true)
+        {
+            return false;
+        }
+        return true;
     }
 }

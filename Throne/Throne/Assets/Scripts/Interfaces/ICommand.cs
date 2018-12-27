@@ -11,6 +11,6 @@ public interface Icommand {
     void SetPoint(Vector3 point);
     GameObject GetUnit();
     void SetUnit(GameObject newUnit);
-
     void KeyBindCommand();
+    int GetBuildTime();
 }

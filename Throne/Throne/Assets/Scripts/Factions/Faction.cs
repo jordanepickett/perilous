@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Faction : MonoBehaviour {
+public class Faction : NetworkBehaviour {
 
     [SerializeField]
     protected List<Item> buildings;
+
+    [SerializeField]
+    protected List<Upgrade> upgrades;
 
     private string name;
 
@@ -22,5 +26,10 @@ public class Faction : MonoBehaviour {
     public List<Item> GetBuildableBuildings()
     {
         return buildings;
+    }
+
+    public List<Upgrade> GetUpgradeableUpgrades()
+    {
+        return upgrades;
     }
 }

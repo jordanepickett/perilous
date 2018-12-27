@@ -13,6 +13,11 @@ public class UiManager : MonoBehaviour {
 
     public bool isBuildingPanelOpen = false;
 
+    public GameObject unitPanel;
+    //public Image unitTimer;
+    public GameObject infoPanel;
+    public UiPortraitManager unitPortrait;
+
     private List<Icommand> unitCommands = new List<Icommand>();
     public List<Icommand> GetUnitCommands()
     {
@@ -23,6 +28,11 @@ public class UiManager : MonoBehaviour {
 
     public static UiManager main;
 
+    public SelectableUnit GetFirstUnit()
+    {
+        return firstUnit;
+    }
+
     private void Awake()
     {
         main = this;
@@ -32,21 +42,26 @@ public class UiManager : MonoBehaviour {
     void Start () {
         //UnitCommands();
         SelectionManager.main.FirstUnitChanged += CheckFirstUnit;
+        unitPortrait = GetComponent<UiPortraitManager>();
         InitializeCommands();
     }
 	
 	// Update is called once per frame
 	void Update () {
-	}
+        //DisplayUnitPanel();
+    }
 
     public void UnitCommands()
     {
-        Debug.Log(SelectionManager.main.FirstUnit().GetComponent<Unit>().IsInteractable());
         if(SelectionManager.main.FirstUnit().GetComponent<Unit>().IsInteractable())
         {
             GameObject newObj;
             foreach (var command in unitCommands)
             {
+                if(command.GetUnitCommand() == global::UnitCommands.Gather && firstUnit.GetComponent<Unit>().unitType != UnitType.Worker)
+                {
+                    continue;
+                }
                 newObj = (GameObject)Instantiate(prefab, transform);
                 newObj.GetComponent<CommandUiSender>().SetCommand(command);
                 UnitPanel.Add(BtnDecorator.Decorate(newObj));
@@ -99,34 +114,52 @@ public class UiManager : MonoBehaviour {
 
     public void BuildingCommands()
     {
-        isBuildingPanelOpen = true;
-        GameObject newObj;
-
-        foreach (var item in firstUnit.GetComponent<FactionA>().GetBuildableBuildings())
+        if (SelectionManager.main.FirstUnit().GetComponent<Unit>().IsInteractable())
         {
-            if(item.BuildingId == firstUnit.GetComponent<RtsObject>().GetItem().ID)
+            isBuildingPanelOpen = true;
+            GameObject newObj;
+            firstUnit.GetComponent<FactionA>().SyncUnitAvailability();
+            foreach (var item in firstUnit.GetComponent<FactionA>().GetBuildableBuildings())
             {
-                newObj = (GameObject)Instantiate(prefab, transform);
-                BuildCommand buildCommand = new BuildCommand(item.keyBind);
-                buildCommand.SetUnit(item.Prefab);
-                newObj.GetComponent<CommandUiSender>().SetCommand(buildCommand);
-                newObj.GetComponent<Image>().sprite = item.ItemImage;
-                item.Prefab.GetComponent<RtsObject>().SetItem(item);
-                UnitPanel.Add(BtnDecorator.BuildDecorate(newObj));
+                if (item.BuildingId == firstUnit.GetComponent<RtsObject>().GetItem().ID)
+                {
+                    newObj = (GameObject)Instantiate(prefab, transform);
+                    if (!item.isAvailable)
+                    {
+                        newObj.GetComponent<Button>().interactable = false;
+                    }
+                    BuildCommand buildCommand = new BuildCommand(item.keyBind);
+                    buildCommand.SetUnit(item.Prefab);
+                    newObj.GetComponent<CommandUiSender>().SetCommand(buildCommand);
+                    newObj.GetComponent<CommandUiSender>().infoPanel = infoPanel;
+                    newObj.GetComponent<Image>().sprite = item.ItemImage;
+                    item.Prefab.GetComponent<RtsObject>().SetItem(item);
+                    UnitPanel.Add(BtnDecorator.BuildDecorate(newObj));
+                }
             }
         }
     }
 
     public void CheckFirstUnit()
     {
-        if(firstUnit == null || firstUnit.GetComponent<RtsObject>().gameObject != SelectionManager.main.FirstUnit().GetComponent<RtsObject>().gameObject || isBuildingPanelOpen == true)
+        if(firstUnit == null || firstUnit.gameObject != SelectionManager.main.FirstUnit().gameObject || isBuildingPanelOpen == true)
         {
             firstUnit = SelectionManager.main.FirstUnit();
+            RtsObject obj = firstUnit.GetComponent<RtsObject>();
             ClearUnitPanel();
-            firstUnit.GetComponent<RtsObject>().DisplayPanel();
+            obj.DisplayPanel();
+            unitPortrait.UpdatePortrait();
             isBuildingPanelOpen = false;
         }
-       
+    }
+
+    public void ShowUnitPanel()
+    {
+        RtsObject obj = firstUnit.GetComponent<RtsObject>();
+        ClearUnitPanel();
+        obj.DisplayPanel();
+        unitPortrait.UpdatePortrait();
+        isBuildingPanelOpen = false;
     }
 
     public void ClearUnitPanel()
@@ -135,30 +168,40 @@ public class UiManager : MonoBehaviour {
         {
             Destroy(command);
         }
+        UnitPanel.Clear();
+        UiBuildingPanelManager.main.unitTimer.transform.parent.gameObject.SetActive(false);
     }
 
+    //WORKERS BUILDING PANEL
     public void CreateBuildingsPanel()
     {
         isBuildingPanelOpen = true;
         ClearUnitPanel();
         GameObject newObj;
-
-        foreach(var item in firstUnit.GetComponent<FactionA>().GetBuildableBuildings())
+        if(SelectionManager.main.FirstUnit().GetComponent<Unit>().IsInteractable())
         {
-            if(item.TypeIdentifier == UnitType.Building)
+            firstUnit.GetComponent<FactionA>().SyncUnitAvailability();
+            foreach (var item in firstUnit.GetComponent<FactionA>().GetBuildableBuildings())
             {
-                newObj = (GameObject)Instantiate(prefab, transform);
-                BuildCommand buildCommand = new BuildCommand(item.keyBind);
-                buildCommand.SetUnit(item.Prefab);
-                newObj.GetComponent<CommandUiSender>().SetCommand(buildCommand);
-                newObj.GetComponent<Image>().sprite = item.ItemImage;
-                item.Prefab.GetComponent<RtsObject>().SetItem(item);
-                UnitPanel.Add(BtnDecorator.BuildDecorate(newObj));
+                if (item.TypeIdentifier == UnitType.Building)
+                {
+                    Debug.Log(item.Name + " AVAILABLE: " + item.isAvailable);
+                    newObj = (GameObject)Instantiate(prefab, transform);
+                    if (!item.isAvailable)
+                    {
+                        newObj.GetComponent<Button>().interactable = false;
+                    }
+                    BuildCommand buildCommand = new BuildCommand(item.keyBind);
+                    buildCommand.SetUnit(item.Prefab);
+                    newObj.GetComponent<CommandUiSender>().SetCommand(buildCommand);
+                    newObj.GetComponent<CommandUiSender>().infoPanel = infoPanel;
+                    newObj.GetComponent<Image>().sprite = item.ItemImage;
+                    item.Prefab.GetComponent<RtsObject>().SetItem(item);
+                    UnitPanel.Add(BtnDecorator.KeyBindDecorate(newObj));
+                }
             }
         }
 
         //newObj = (GameObject)Instantiate(prefab, transform);
-
-
     }
 }

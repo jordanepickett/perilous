@@ -9,6 +9,8 @@ public class PlayerController : NetworkBehaviour
 
     private Faction playerFaction;
 
+    public Camera gCamera;
+
     [SerializeField]
     [SyncVar(hook = "OnGold")]
     public int gold;
@@ -35,11 +37,13 @@ public class PlayerController : NetworkBehaviour
 
     public void AddGold(int goldAmount)
     {
+        Debug.Log(goldAmount);
         gold += goldAmount;
     }
 
     public void RemoveGold(int goldAmount)
     {
+        Debug.Log("GOLD REMOVED");
         gold -= goldAmount;
     }
 
@@ -50,13 +54,14 @@ public class PlayerController : NetworkBehaviour
 
     public void AddLumber(int lumberAmount)
     {
-        Debug.Log(lumberAmount);
+        Debug.Log("LUMBER ADDED " + lumberAmount);
         lumber += lumberAmount;
     }
 
-    public void RemoveLumber(int lumberAmout)
+    public void RemoveLumber(int lumberAmount)
     {
-        lumber -= lumber;
+        Debug.Log("LUMBER REMOVED " + lumberAmount);
+        lumber -= lumberAmount;
     }
 
     public Faction GetFaction()
@@ -64,8 +69,29 @@ public class PlayerController : NetworkBehaviour
         return playerFaction;
     }
 
-    private void Awake()
+    private void Start()
     {
+        if (isLocalPlayer)
+        {
+            gCamera.gameObject.SetActive(true);
+            gCamera.gameObject.SetActive(true);
+            GameObject miniMap = Resources.Load("Camera") as GameObject;
+            miniMap = Instantiate(miniMap) as GameObject;
+            if(!FoW.FogOfWar.GetFogOfWarTeam(teamId))
+            {
+                gCamera.GetComponent<FoW.FogOfWar>().AddInstance(gCamera.GetComponent<FoW.FogOfWar>());
+            }
+            miniMap.AddComponent<FoW.FogOfWarSecondary>();
+            miniMap.GetComponent<FoW.FogOfWarSecondary>().team = teamId;
+            miniMap.GetComponent<MinimapSelector>().SetGCamera(gCamera);
+            SelectionManager.main.teamId = teamId;
+            Debug.Log("LOCAL " + teamId);
+        }
+        else
+        {
+            gCamera.gameObject.SetActive(false);
+            Debug.Log("NOT LOCAL " + teamId);
+        }
     }
 
     public override void OnStartLocalPlayer()
@@ -75,9 +101,10 @@ public class PlayerController : NetworkBehaviour
         base.OnStartLocalPlayer();
         FactionABuildings.Initialise();
 
-        playerFaction = gameObject.AddComponent<FactionA>();
+        //playerFaction = gameObject.AddComponent<FactionA>();
         playerFaction = GetComponent<Faction>();
         playerFaction.SetName("Human");
+
         //On initialization, make the client (local client and remote clients) tell the server to call on an [ClientRpc] method.
         CmdCall();
 
@@ -96,30 +123,56 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        if (isLocalPlayer)
+        {
+
+        }
+        else
+        {
+            gCamera.gameObject.SetActive(false);
+        }
+        CustomNetworkManager.singleton.GetComponent<PlayersContainer>().AddPlayer(gameObject);
+        gCamera.GetComponent<FoW.FogOfWar>().team = teamId;
+        gCamera.GetComponent<FoW.FogOfWar>().AddInstance(gCamera.GetComponent<FoW.FogOfWar>());
+        gCamera.GetComponent<MainCameraTest>().player = this;
+
+    }
+
     [Command]
     public void CmdCall()
     {
+        RpcLog(0);
         //Calling [ClientRpc] on the server.
         FactionABuildings.Initialise();
-        gameObject.AddComponent<FactionA>();
-        RpcLog(0);
+        UpgradeDB.Initialise();
+        //gameObject.AddComponent<FactionA>();
         for (int i = 0; i < 3; i++)
         {
+            spawnPrefab.transform.position = transform.position;
             GameObject obj = MonoBehaviour.Instantiate(this.spawnPrefab) as GameObject;
-            obj.GetComponent<RtsObjectController>().teamId = teamId;
-            obj.GetComponent<RtsObjectController>().color = color;
-            obj.GetComponent<RtsObjectController>().factionId = 0;
+            obj.transform.position = transform.position;
+            obj.GetComponent<Unit>().previousPos = transform.position;
+            RtsObjectController objController = obj.GetComponent<RtsObjectController>();
+            Debug.Log(transform.position + " " + obj.transform.position);
+            objController.teamId = teamId;
+            objController.instantSpawn = true;
+            objController.ParentObject = gameObject;
+            objController.color = color;
+            objController.factionId = 0;
             obj.GetComponent<RtsObject>().conn = this.connectionToClient;
-            obj.GetComponent<RtsObjectController>().SetPlayer(gameObject);
+            objController.SetPlayer(gameObject);
             foreach (var item in GetComponent<FactionA>().GetBuildableBuildings())
             {
                 if (item.TypeIdentifier == UnitType.Worker)
                 {
                     obj.GetComponent<RtsObjectController>().itemId = item.ID;
+                    break;
                 }
             }
             NetworkServer.SpawnWithClientAuthority(obj, this.connectionToClient);
-         
         }
     }
 
@@ -153,23 +206,43 @@ public class PlayerController : NetworkBehaviour
 
     public void OnGold(int amount)
     {
-        gold += amount;
-        Debug.Log("GOLD AMOUNT  = " + amount);
+        gold = amount;
     }
 
     public void OnLumber(int amount)
     {
-        lumber += amount;
-        Debug.Log("LUMBER AMOUNT = " + amount);
+        lumber = amount;
     }
 
     void OnGUI()
     {
-        int TextWidth = 100;
-        GUI.Box(new Rect(Screen.width - TextWidth, 10, TextWidth, 55), "Current Gold");
-        GUI.Box(new Rect(Screen.width - TextWidth, 40, TextWidth, 55), gold.ToString());
-        GUI.Box(new Rect(Screen.width - TextWidth, 100, TextWidth, 55), "Current Lumber");
-        GUI.Box(new Rect(Screen.width - TextWidth, 130, TextWidth, 55), lumber.ToString());
+        if(isLocalPlayer)
+        {
+            int TextWidth = 100;
+            GUI.Box(new Rect(Screen.width - TextWidth, 10, TextWidth, 55), "Current Gold");
+            GUI.Box(new Rect(Screen.width - TextWidth, 40, TextWidth, 55), gold.ToString());
+            GUI.Box(new Rect(Screen.width - TextWidth, 100, TextWidth, 55), "Current Lumber");
+            GUI.Box(new Rect(Screen.width - TextWidth, 130, TextWidth, 55), lumber.ToString());
+
+            GUI.Box(new Rect(Screen.width - (TextWidth + 200), 10, TextWidth, 55), "Food");
+            GUI.Box(new Rect(Screen.width - (TextWidth + 200), 40, TextWidth, 55), GetComponent<PlayerUnitController>().unitsExisting + "/" + GetComponent<PlayerUnitController>().allowedUnits);
+        }
+    }
+
+    void OnPlayerDisconnected(NetworkPlayer player)
+    {
+        CustomNetworkManager.singleton.GetComponent<PlayersContainer>().RemovePlayer(gameObject);
+        RpcRemovePlayer(gameObject);
+        Debug.Log("Clean up after player " + player);
+
+        Network.RemoveRPCs(player);
+        Network.DestroyPlayerObjects(player);
+    }
+
+    [ClientRpc]
+    void RpcRemovePlayer(GameObject player)
+    {
+        CustomNetworkManager.singleton.GetComponent<PlayersContainer>().RemovePlayer(gameObject);
     }
 }
 

@@ -37,4 +37,14 @@ public abstract class Command {
     {
         this.point = point;
     }
+
+    public int GetBuildTime()
+    {
+        return 0;
+    }
+
+    public Upgrade GetUpgrade()
+    {
+        return new global::Upgrade();
+    }
 }

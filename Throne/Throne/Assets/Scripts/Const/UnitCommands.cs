@@ -6,7 +6,8 @@
     Patrol,
     Repair,
     Gather,
-    Build
+    Build,
+    Upgrade
 }
 
 public enum AttackType

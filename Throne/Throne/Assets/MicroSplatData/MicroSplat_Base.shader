@@ -4,11 +4,11 @@
 //
 // Auto-generated shader code, don't hand edit!
 //   Compiled with MicroSplat 1.7
-//   Unity : 5.6.1f1
+//   Unity : 2017.2.0f3
 //   Platform : WindowsEditor
 //////////////////////////////////////////////////////
 
-Shader "Hidden/MicroSplat/Terrain_Base-1985293227" {
+Shader "Hidden/MicroSplat/Terrain_Base878182904" {
    Properties {
       [HideInInspector] _Control0 ("Control0", 2D) = "red" {}
       [HideInInspector] _Control1 ("Control1", 2D) = "black" {}
@@ -47,6 +47,7 @@ Shader "Hidden/MicroSplat/Terrain_Base-1985293227" {
       #define _PERTEXCONTRAST 1
       #define _PERTEXNORMSTR 1
       #define _PERTEXSMOOTHSTR 1
+      #define _PERTEXTINT 1
       #define _PERTEXUVSCALEOFFSET 1
 
 

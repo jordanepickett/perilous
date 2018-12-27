@@ -4,7 +4,7 @@
 //
 // Auto-generated shader code, don't hand edit!
 //   Compiled with MicroSplat 1.7
-//   Unity : 5.6.1f1
+//   Unity : 2017.2.0f3
 //   Platform : WindowsEditor
 //////////////////////////////////////////////////////
 
@@ -47,6 +47,7 @@ Shader "MicroSplat/Terrain" {
       #define _PERTEXCONTRAST 1
       #define _PERTEXNORMSTR 1
       #define _PERTEXSMOOTHSTR 1
+      #define _PERTEXTINT 1
       #define _PERTEXUVSCALEOFFSET 1
 
 
@@ -1098,7 +1099,7 @@ ENDCG
 
    }
    Dependency "AddPassShader" = "Hidden/MicroSplat/AddPass"
-   Dependency "BaseMapShader" = "Hidden/MicroSplat/Terrain_Base-1985293227"
+   Dependency "BaseMapShader" = "Hidden/MicroSplat/Terrain_Base878182904"
    CustomEditor "MicroSplatShaderGUI"
    Fallback "Nature/Terrain/Diffuse"
 }

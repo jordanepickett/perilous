@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/ServerClient_Setup/Scenes/MainMenu.unity
+- path: Assets/Scenes/tile.unity
   isLoaded: 1
   isActive: 1

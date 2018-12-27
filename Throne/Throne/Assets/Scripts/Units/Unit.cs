@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Networking;
 
 public enum state
@@ -39,7 +40,26 @@ public class Unit : RtsObject {
     protected List<Icommand> queueCommands = new List<Icommand>();
     protected event CheckQueue CheckQueue;
 
+    public static int MAX_COMMANDS_ALLOWED = 5;
+
+    [SyncVar]
     protected int buildSeconds;
+
+    protected float timer;
+    protected float buildingTime;
+
+    public int GetBuildSeconds()
+    {
+        return buildSeconds;
+    }
+
+    public float GetBuildingTime()
+    {
+        return buildingTime;
+    }
+
+    [SyncVar]
+    public Vector3 previousPos;
 
     public state GetState()
     {
@@ -63,7 +83,6 @@ public class Unit : RtsObject {
     // Use this for initialization
     void Awake () {
         Initialized();
-        gameObject.AddComponent<FactionA>();
     }
 
     protected virtual void Initialized()
@@ -71,7 +90,6 @@ public class Unit : RtsObject {
         CheckQueue += CheckCommandQueue;
         StateChanged += OnChangedStates;
         SetState(state.IDLE);
-
     }
 
     protected virtual void OnChangedStates(state newState)
@@ -110,12 +128,12 @@ public class Unit : RtsObject {
 	
 	// Update is called once per frame
 	void Update () {
-		
+
 	}
 
     public override void Command(Icommand command, bool addToQueue = true)
     {
-        Debug.Log(command.GetUnitCommand());
+        //Debug.Log(command.GetUnitCommand() + " " + addToQueue);
         if (isInteractable)
         {
             switch (command.GetUnitCommand())
@@ -139,15 +157,21 @@ public class Unit : RtsObject {
                 case (UnitCommands.Build):
                     if (this.unitType == UnitType.Worker || this.unitType == UnitType.Building)
                     {
-                        BuildCommand(command);
-                        if(addToQueue)
+                        if(GetState() != state.BUILDING)
+                        {
+                            timer = 0.0f;
+                        }
+                        if (addToQueue && queueCommands.Count < MAX_COMMANDS_ALLOWED)
                         {
                             queueCommands.Add(command);
+                            DisplayBuildingQueue();
+                            //Debug.Log(queueCommands.Count);
                         }
+                        BuildCommand(command);
                     }
                     break;
                 case (UnitCommands.Gather):
-                    if(unitType == UnitType.Worker)
+                    if(unitType == UnitType.Worker && GetState() != state.GATHERING)
                     {
                         GatherCommand(command);
                     }
@@ -169,15 +193,14 @@ public class Unit : RtsObject {
 
     void BuildCommand(Icommand command)
     {
-        if (GetState() == state.BUILDING)
+        if (GetState() == state.BUILDING || !CanBuildUnit(command))
         {
             return;
         }
         SetState(state.BUILDING);
-        Debug.Log("BUILDING STATE SET");
         bool atDestination = true;
         this.command = command;
-        CmdBuildSeconds((int)command.GetUnit().GetComponent<Unit>().GetItem().BuildTime);
+        CmdBuildSeconds(command.GetBuildTime());
         if(this.unitType == UnitType.Worker)
         {
             if (transform.position != command.GetPoint())
@@ -198,6 +221,29 @@ public class Unit : RtsObject {
     
     }
 
+    private bool CanBuildUnit(Icommand command)
+    {
+        if (!SelectionManager.main.FirstUnit())
+        {
+            return false;
+        }
+        PlayerUnitController player = SelectionManager.main.FirstUnit().GetComponent<RtsObjectController>().GetPlayer().GetComponent<PlayerUnitController>();
+        int totalGold = player.GetComponent<PlayerController>().gold;
+        int totalLumber = player.GetComponent<PlayerController>().lumber;
+
+        if (command.GetUnit().GetComponent<Unit>().unitType != UnitType.Building && (command.GetUnit().GetComponent<Unit>().GetItem().food + player.unitsExisting) > player.allowedUnits)
+        {
+            return false;
+        }
+
+        if (command.GetUnit().GetComponent<Unit>().GetItem().Cost > totalGold || command.GetUnit().GetComponent<Unit>().GetItem().Lumber > totalLumber)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     [Command]
     void CmdBuildSeconds(int seconds)
     {
@@ -216,6 +262,7 @@ public class Unit : RtsObject {
                 point = newPoint;
             }
             GameObject obj = Instantiate(prefab, new Vector3(point.x, point.y - 3, point.z), Quaternion.Euler(0, -210, 0)) as GameObject;
+            obj.GetComponent<Unit>().previousPos = obj.transform.position;
             obj.GetComponent<RtsObjectController>().teamId = GetComponent<RtsObjectController>().teamId;
             obj.GetComponent<RtsObjectController>().itemId = id;
             obj.GetComponent<RtsObjectController>().color = GetComponent<RtsObjectController>().color;
@@ -224,7 +271,6 @@ public class Unit : RtsObject {
             obj.GetComponent<RtsObjectController>().SetPlayer(GetComponent<RtsObjectController>().GetPlayer());
             NetworkServer.SpawnWithClientAuthority(obj, conn);
             RpcBuildBuilding(obj);
-
             //SetState(state.BUILDING);
             //obj.GetComponent<Unit>().DeployPlacement();
         }
@@ -244,7 +290,6 @@ public class Unit : RtsObject {
         }
         CmdBuildBuilding(command.GetUnit().GetComponent<RtsObject>().GetItem().ID, command.GetPoint());
         GetComponent<Movement>().Hold(state.BUILDING);
-        Debug.Log("HOLD");
     }
 
     public virtual void Deploying()
@@ -252,6 +297,8 @@ public class Unit : RtsObject {
         isMovable = false;
         isInteractable = false;
         gameObject.GetComponent<Renderer>().enabled = false;
+        GetComponent<NavMeshAgent>().enabled = false;
+        transform.position = GetComponent<RtsObjectController>().ParentObject.transform.position;
         StartCoroutine(DeployLength(GetItem().BuildTime));
     }
 
@@ -259,30 +306,38 @@ public class Unit : RtsObject {
     {
         yield return new WaitForSeconds(seconds);
         gameObject.GetComponent<Renderer>().enabled = true;
+        transform.position = previousPos;
+        GetComponent<NavMeshAgent>().enabled = true;
         SetState(state.IDLE);
+        DisplayCommands();
         GetComponent<RtsObjectController>().GetPlayer().GetComponent<PlayerUnitController>().AddUnit(gameObject);
     }
 
     public IEnumerator BuildingLength(float seconds)
     {
         isMovable = false;
-        isInteractable = false;
+        if(unitType != UnitType.Building)
+        {
+            isInteractable = false;
+        }
         gameObject.GetComponent<Renderer>().enabled = false;
         yield return new WaitForSeconds(seconds);
         gameObject.GetComponent<Renderer>().enabled = true;
-        Debug.Log("SECONDS" + seconds);
         SetState(state.IDLE);
+        DisplayCommands();
         CheckQueue();
     }
 
     protected void CheckCommandQueue()
     {
+        Debug.Log(queueCommands.Count);
         if(queueCommands.Count > 0)
         {
             queueCommands.RemoveAt(0);
             if (queueCommands.Count > 0)
             {
                 Command(queueCommands[0], false);
+                DisplayBuildingQueue();
             }
 
             foreach (var q in queueCommands)
@@ -321,11 +376,93 @@ public class Unit : RtsObject {
 
     public void TakeDamage(int[] damageInfo)
     {
-        health -= damageInfo[0];
-        if(health <= 0)
+        int damage = damageInfo[0];
+        if (armor > 0)
         {
-            health = 0;
-            NetworkServer.Destroy(gameObject);
+            damage = damageInfo[0];
+        }
+        currentHealth -= damage;
+        if(currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        currentHealth = 0;
+        GetComponent<RtsObjectController>().GetPlayer().GetComponent<PlayerUnitController>().RemoveUnit(gameObject);
+        if(isServer)
+        {
+            RpcRemoveUnit();
+        }
+        NetworkServer.Destroy(gameObject);
+    }
+
+    [ClientRpc]
+    void RpcRemoveUnit()
+    {
+        GetComponent<RtsObjectController>().GetPlayer().GetComponent<PlayerUnitController>().RemoveUnit(gameObject);
+        if (SelectionManager.main.ContainsUnit(GetComponent<SelectableUnit>()))
+        {
+            SelectionManager.main.RemoveUnit(GetComponent<SelectableUnit>());
+        }
+    }
+
+    public void RemoveCommandFromQueue(int index)
+    {
+        Debug.Log(index);
+        if(index > 0)
+        {
+            index -= 1;
+        }
+        Icommand command = queueCommands[index];
+        if(index == 0)
+        {
+            Destroy(command.GetUnit().gameObject);
+        }
+        queueCommands.Remove(command);
+        queueCommands.TrimExcess();
+        DisplayBuildingQueue();
+
+    }
+
+    protected void HideCommands()
+    {
+        if(hasAuthority)
+        {
+            if (IsUnitFirstUnit())
+            {
+                UiManager.main.ClearUnitPanel();
+            }
+        }
+    }
+
+    protected void DisplayCommands()
+    {
+        if(hasAuthority)
+        {
+            if (IsUnitFirstUnit())
+            {
+                UiManager.main.ShowUnitPanel();
+            }
+        }
+    }
+
+    protected bool IsUnitFirstUnit()
+    {
+        if (GetComponent<SelectableUnit>() == UiManager.main.GetFirstUnit())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    protected void DisplayBuildingQueue()
+    {
+        if (IsUnitFirstUnit() && unitType == UnitType.Building)
+        {
+            UiBuildingPanelManager.main.DisplayQueueUI(queueCommands);
         }
     }
 

@@ -30,7 +30,7 @@ public class GatherCommand : Command, Icommand
 
     public GatherCommand()
     {
-        EventsManager.main.RightMouseClickObject += GiveGatherCommand;
+        EventsManager.main.RightMouseClickNode += GiveGatherCommand;
         unitCommand = UnitCommands.Gather;
         SetKeyBind(KeyCode.G);
     }
@@ -62,8 +62,11 @@ public class GatherCommand : Command, Icommand
 
     void GiveGatherCommand(RaycastHit point)
     {
-        Debug.Log("COMMAND GIVEN");
-        CommandInfo(point);
+        if(point.collider.gameObject.GetComponent<GatherNode>())
+        {
+            Debug.Log("COMMAND GIVEN");
+            CommandInfo(point);
+        }
     }
 
     void CommandInfo(RaycastHit point)

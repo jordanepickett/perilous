@@ -19,6 +19,7 @@ public class Movement : NetworkBehaviour {
 	// Use this for initialization
 	void Start () {
         agent = GetComponent<NavMeshAgent>();
+        agent.enabled = true;
         unit = GetComponent<Unit>();
         agent.speed = speed;
         agent.angularSpeed = turnSpeed;
@@ -34,7 +35,7 @@ public class Movement : NetworkBehaviour {
         if (unit.GetState() == state.MOVING)
         {
             float dist = agent.remainingDistance;
-            if (agent.remainingDistance <= 0.1f)
+            if (agent.remainingDistance <= 0.5f)
             {
                 unit.SetState(state.IDLE);
             }
@@ -43,8 +44,11 @@ public class Movement : NetworkBehaviour {
 
     public void MoveUnit(Vector3 point)
     {
-        if (!isServer)
-            CmdSetTarget(point);
+        if(hasAuthority)
+        {
+            if (!isServer)
+                CmdSetTarget(point);
+        }
     }
 
     public void UnitMove(Vector3 point)

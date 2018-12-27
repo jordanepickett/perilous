@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class MainCameraTest : NetworkBehaviour {
+public class MainCameraTest : MonoBehaviour {
 
     //outside of the update loop
     float cameraMovementSpeed = 35f;
@@ -17,7 +17,7 @@ public class MainCameraTest : NetworkBehaviour {
 
     void Awake()
     {
-
+        //transform.position = new Vector3(player.transform.position.x, 12, player.transform.position.z);
     }
 
     private void Update()

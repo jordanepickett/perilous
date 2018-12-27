@@ -31,7 +31,7 @@ public class GatherNode : NetworkBehaviour {
 
     public void Gather()
     {
-        nodeAmount -= 1;
+        nodeAmount -= 2;
         if(nodeAmount <= 0)
         {
             nodeAmount = 0;

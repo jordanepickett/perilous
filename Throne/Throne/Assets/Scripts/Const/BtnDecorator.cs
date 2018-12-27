@@ -36,4 +36,12 @@ public static class BtnDecorator {
         obj.GetComponent<Button>().GetComponentInChildren<Text>().text = "Build";
         return obj;
     }
+
+    public static GameObject KeyBindDecorate(GameObject obj)
+    {
+        string keybind = obj.GetComponent<CommandUiSender>().GetCommand().GetKeyBind().ToString();
+        obj.GetComponent<Button>().GetComponentInChildren<Text>().color = Color.white;
+        obj.GetComponent<Button>().GetComponentInChildren<Text>().text = keybind;
+        return obj;
+    }
 }

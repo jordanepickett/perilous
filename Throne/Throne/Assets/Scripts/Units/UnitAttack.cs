@@ -31,6 +31,7 @@ public class UnitAttack : NetworkBehaviour {
     [SyncVar]
     public float attackSpeed;
 
+    [SerializeField]
     private GameObject target;
 
     private Movement movement;
@@ -46,6 +47,10 @@ public class UnitAttack : NetworkBehaviour {
 
     public void SetTarget(GameObject tar)
     {
+        if(GetTarget() && GetTarget() == tar)
+        {
+            return;
+        }
         CmdSetTarget(tar);
     }
 
@@ -77,7 +82,7 @@ public class UnitAttack : NetworkBehaviour {
 	
 	public void Attack()
     {
-        if (!attackCanceled && GetTarget())
+        if (!attackCanceled && GetTarget() && GetComponent<Unit>().isMovable)
         {
             if (DetectRange())
             {
@@ -85,7 +90,11 @@ public class UnitAttack : NetworkBehaviour {
             }
             else
             {
-                movement.MoveUnit(GetTarget().transform.position);
+                //MoveCommand moveCommand = (MoveCommand)UiManager.main.GetUnitCommands().Find(c => c.GetUnitCommand() == UnitCommands.Move);
+                //Debug.Log(GetTarget().gameObject.GetComponent<Collider>().ClosestPoint(transform.position));
+                //moveCommand.SetPoint(GetTarget().gameObject.GetComponent<Collider>().ClosestPoint(transform.position));
+                //MovementManager.main.GiveMovementAttackCommand(moveCommand);
+                movement.MoveUnit(GetTarget().gameObject.GetComponent<Collider>().ClosestPoint(transform.position));
             }
         }
     }
@@ -94,20 +103,35 @@ public class UnitAttack : NetworkBehaviour {
     {
         if (Time.time >= timestamp)
         {
-            GetComponent<Unit>().isMovable = false;
+            //GetComponent<Unit>().isMovable = false;
+            Debug.Log("FIRE ATTACK");
+            transform.LookAt(new Vector3(GetTarget().transform.position.x, transform.position.y, GetTarget().transform.position.z));
+            //StartCoroutine(Animation(1f));
             timestamp = Time.time + attackSpeed;
-            if (!isServer)
+            if (!isServer && hasAuthority)
                 CmdSendAttack();
         }
+        //if(Time.time >= timestamp + 2f)
+        //{
+            //GetComponent<Unit>().isMovable = true;
+        //}
+    }
+
+    public IEnumerator Animation(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
         GetComponent<Unit>().isMovable = true;
     }
 
     [Command]
     public void CmdSendAttack()
     {
-        int[] damageInfo = new int[] { damage, piercingDamage, damageType};
+        int minDamage = damage - 3;
+        int maxDamage = damage + 2;
+        int rngDamage = Random.Range(minDamage, maxDamage);
+        int[] damageInfo = new int[] { rngDamage, piercingDamage, damageType};
         target.GetComponent<Unit>().TakeDamage(damageInfo);
-        Debug.Log("Damage sent " + damageInfo[0]);
+        Debug.Log("Damage sent " + rngDamage);
         RpcDamageSent();
     }
 
@@ -115,11 +139,12 @@ public class UnitAttack : NetworkBehaviour {
     public void RpcDamageSent()
     {
         Debug.Log("Damage sent");
+        GetComponent<Unit>().isMovable = true;
     }
 
     private bool DetectRange()
     {
-        if(Vector3.Distance(transform.position, GetTarget().transform.position) < range)
+        if(Vector3.Distance(transform.position, GetTarget().gameObject.GetComponent<Collider>().ClosestPoint(transform.position)) <= range + 0.5f)
         {
             movement.Hold(state.ATTACKING);
             return true;
@@ -129,7 +154,29 @@ public class UnitAttack : NetworkBehaviour {
 
     public void CancelAttack(Vector3 point)
     {
-        if(GetComponent<Unit>().GetState() == state.ATTACKING)
+        if(hasAuthority && SelectionManager.main.ContainsUnit(GetComponent<SelectableUnit>()))
+        {
+            CmdCancelAttack(point);
+        }
+    }
+
+    [Command]
+    void CmdCancelAttack(Vector3 point)
+    {
+        MoveAfterCancel(point);
+        RpcCancelAttack(point);
+    }
+
+    [ClientRpc]
+    void RpcCancelAttack(Vector3 point)
+    {
+        MoveAfterCancel(point);
+    }
+
+    void MoveAfterCancel(Vector3 point)
+    {
+        target = null;
+        if (GetComponent<Unit>().GetState() == state.ATTACKING)
         {
             GetComponent<Unit>().SetState(state.IDLE);
             attackCanceled = true;

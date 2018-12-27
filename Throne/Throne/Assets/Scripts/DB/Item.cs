@@ -22,9 +22,13 @@ public class Item
     public Attack attack;
 
     public GameObject Prefab;
+    public GameObject PrefabPlacement;
 
-    public int Cost;
+    public int Cost = 0;
+    public int Lumber = 0;
     public float BuildTime;
+    public int food = 0;
+    public bool isAvailable = false;
 
     public UnitType TypeIdentifier;
     public Team TeamIdentifier;
@@ -51,7 +55,7 @@ public class Item
     }
 
     public int SortOrder;
-    public int[] RequiredBuildings;
+    public int[] RequiredBuildings = new int[0];
     public GameObject Explosion;
     public Type ObjectType;
 
@@ -123,9 +127,12 @@ public class Item
         Speed = item.Speed;
         RotationSpeed = item.RotationSpeed;
         Prefab = item.Prefab;
+        PrefabPlacement = item.PrefabPlacement;
         BuildingId = item.BuildingId;
         Cost = item.Cost;
         BuildTime = item.BuildTime;
+        food = item.food;
+        Lumber = item.Lumber;
         TypeIdentifier = item.TypeIdentifier;
         TeamIdentifier = item.TeamIdentifier;
         m_ItemImage = item.ItemImage;

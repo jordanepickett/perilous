@@ -5,6 +5,7 @@ using UnityEngine;
 public partial class EventsManager
 {
     bool isSelecting = false;
+    bool leftClickDown = false;
     Vector3 mousePosition1;
 
     public void Start()
@@ -16,24 +17,33 @@ public partial class EventsManager
         // If we press the left mouse button, save mouse location and begin selection
         if (Input.GetMouseButtonDown(0))
         {
-            isSelecting = true;
             mousePosition1 = Input.mousePosition;
+            leftClickDown = true;
 
-            if (LeftMouseClick != null)
+            RaycastHit hit = new RaycastHit();
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
             {
-                RaycastHit hit = new RaycastHit();
-                if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
-                {
 
-                    LeftMouseClick(hit.point);
-                }
+                LeftMouseClick(hit);
+            }
+        }
+
+        if(leftClickDown == true)
+        {
+            if (Vector3.Distance(mousePosition1, Input.mousePosition) > 25f)
+            {
+                isSelecting = true;
             }
         }
         // If we let go of the left mouse button, end selection
         if (Input.GetMouseButtonUp(0))
         {
-            isSelecting = false;
-            SelectionComplete();
+            leftClickDown = false;
+            if(isSelecting)
+            {
+                isSelecting = false;
+                SelectionComplete();
+            }
         }
 
         //if (Input.GetMouseButtonDown(1))
@@ -58,20 +68,26 @@ public partial class EventsManager
         //    }
         //}
 
-        if (Input.GetMouseButtonUp(1))
+        if (Input.GetMouseButtonDown(1))
         {
             RaycastHit hit = new RaycastHit();
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
             {
                 if (hit.collider.gameObject.tag == "Ground")
                 {
-                    Debug.Log("GROUND HIT");
+
                     RightMouseClick(hit.point);
                 }
                 else
                 {
-                    Debug.Log("FUUUUUUUUUCK");
-                    RightMouseClickObject(hit);
+                    if(hit.collider.gameObject.GetComponent<GatherNode>())
+                    {
+                        RightMouseClickNode(hit);
+                    }
+                    else if(hit.collider.gameObject.GetComponent<RtsObject>())
+                    {
+                        RightMouseClickUnit(hit);
+                    }
                 }
             }
         }

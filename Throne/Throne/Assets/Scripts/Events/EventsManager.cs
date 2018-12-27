@@ -6,7 +6,9 @@ public delegate void MouseActions(object sender);
 public delegate void MouseSelection(Bounds viewPortBounds);
 public delegate void RightMouseClick(Vector3 hit);
 public delegate void RightMouseClickObject(RaycastHit hit);
-public delegate void LeftMouseClick(Vector3 hit);
+public delegate void RightMouseClickUnit(RaycastHit hit);
+public delegate void RightMouseClickNode(RaycastHit hit);
+public delegate void LeftMouseClick(RaycastHit hit);
 
 public delegate void ScreenEdgeActions(object sender, ScreenEdgeEventArgs e);
 
@@ -16,6 +18,8 @@ public partial class EventsManager : MonoBehaviour, IEventsManager {
     public event MouseSelection MouseSelection;
     public event RightMouseClick RightMouseClick;
     public event RightMouseClickObject RightMouseClickObject;
+    public event RightMouseClickUnit RightMouseClickUnit;
+    public event RightMouseClickNode RightMouseClickNode;
     public event LeftMouseClick LeftMouseClick;
     public event ScreenEdgeActions ScreenEdgeMousePosition;
     public Camera gameCamera;
@@ -38,6 +42,7 @@ public partial class EventsManager : MonoBehaviour, IEventsManager {
     {
         CheckMouseClicks();
         CheckScreenEdgeEvents();
+        CheckKeyBoardPresses();
     }
 
     void OnGUI()

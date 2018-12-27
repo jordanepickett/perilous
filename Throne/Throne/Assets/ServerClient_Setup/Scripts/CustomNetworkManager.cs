@@ -39,6 +39,8 @@ public class CustomNetworkManager : NetworkManager
         Color newColor = new Color(UnityEngine.Random.Range(0.0f, 1.0f), UnityEngine.Random.Range(0.0f, 1.0f), UnityEngine.Random.Range(0.0f, 1.0f));
         players.Add(playerPrefab);
         playerPrefab.GetComponent<PlayerController>().teamId = connectedClients;
+        //playerPrefab.GetComponent<PlayerController>().AddGold(620);
+        //playerPrefab.GetComponent<PlayerController>().AddLumber(200);
         playerPrefab.GetComponent<PlayerController>().color = newColor;
 
         //Sending password information to client.

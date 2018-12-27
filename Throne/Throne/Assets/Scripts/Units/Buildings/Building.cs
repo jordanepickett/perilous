@@ -29,9 +29,10 @@ public class Building : Unit {
             case state.GATHERING:
                 break;
             case state.BUILDING:
+                timer += Time.deltaTime;
+                buildingTime = timer;
                 break;
             case state.DEPLOYING:
-                Debug.Log("DEPLOYING");
                 Deploying();
                 break;
         }
@@ -62,11 +63,13 @@ public class Building : Unit {
 
     public override void Deploying()
     {
+        Debug.Log("DEPLOYING");
         t += Time.deltaTime / timeToReachTarget;
         transform.position = Vector3.Lerp(startPosition, target, t);
         if(transform.position == target)
         {
             SetState(state.IDLE);
+            DisplayCommands();
             GetComponent<RtsObjectController>().GetPlayer().GetComponent<PlayerUnitController>().AddUnit(gameObject);
         }
     }
@@ -74,5 +77,6 @@ public class Building : Unit {
     public override void DisplayPanel()
     {
         UiManager.main.BuildingCommands();
+        DisplayBuildingQueue();
     }
 }

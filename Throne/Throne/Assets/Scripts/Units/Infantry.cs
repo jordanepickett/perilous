@@ -8,8 +8,7 @@ public class Infantry : Unit {
 
     // Use this for initialization
     void Start () {
-
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -44,7 +43,7 @@ public class Infantry : Unit {
 
     protected override void OnChangedStates(state newState)
     {
-        Debug.Log(newState);
+       
         switch (State)
         {
             case state.IDLE:
@@ -56,12 +55,12 @@ public class Infantry : Unit {
             case state.GATHERING:
                 break;
             case state.ATTACKING:
-                isMovable = true;
-                isInteractable = true;
                 break;
             case state.BUILDING:
+                HideCommands();
                 break;
             case state.DEPLOYING:
+                HideCommands();
                 isMovable = false;
                 isInteractable = false;
                 Deploying();
@@ -71,6 +70,7 @@ public class Infantry : Unit {
 
     public override void DisplayPanel()
     {
+        Debug.Log("UNIT DISPLAY");
         UiManager.main.UnitCommands();
     }
 }

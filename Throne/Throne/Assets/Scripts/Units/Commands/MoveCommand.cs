@@ -47,11 +47,12 @@ public class MoveCommand : Command, Icommand {
         }
     }
 
-    void SendCommand(Vector3 point)
+    void SendCommand(RaycastHit point)
     {
+        Vector3 position = point.point;
         if (isReadyForLocation)
         {
-            this.point = point;
+            this.point = position;
             MovementManager.main.GiveMovementCommand(this);
             isReadyForLocation = false;
         }

@@ -83,4 +83,12 @@ public static class Utils {
         }
         return null;
     }
+
+    public static float Map(float value, float inMax)
+    {
+        float inMin = 0;
+        float outMin = 0;
+        float outMax = 1;
+        return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+    }
 }

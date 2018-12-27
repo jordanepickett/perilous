@@ -30,7 +30,7 @@ public class BuildCommand : Command, Icommand
         if (SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType == UnitType.Building)
         {
             isReadyForPlacement = true;
-            TryToBuild(new Vector3(0, 0, 0));
+            TryToBuild(new RaycastHit());
         }
         else
         {
@@ -40,18 +40,25 @@ public class BuildCommand : Command, Icommand
 
     void ReadyUpCommand()
     {
-        if (isReadyForPlacement == true)
+        if (MouseManager.main.GetState() != MouseState.BUILDING_PLACEMENT)
         {
-            isReadyForPlacement = false;
-        }
-        else
-        {
-            isReadyForPlacement = true;
-        }
-        if(isReadyForPlacement == true)
-        {
-            MouseManager.main.SetBuildingTobePlaced(GetUnit());
-            MouseManager.main.SetState(MouseState.BUILDING_PLACEMENT);
+            if (isReadyForPlacement == true)
+            {
+                isReadyForPlacement = false;
+            }
+            else
+            {
+                isReadyForPlacement = true;
+            }
+            if (isReadyForPlacement == true)
+            {
+                MouseManager.main.SetBuildingTobePlaced(GetUnit().GetComponent<RtsObject>().GetItem().PrefabPlacement);
+                if(GetUnit().GetComponent<Building>().buildingType == BuildingType.MAIN)
+                {
+                    GetUnit().GetComponent<RtsObject>().GetItem().PrefabPlacement.GetComponentInChildren<PlacementTrigger>().isMainBuilding = true;
+                }
+                MouseManager.main.SetState(MouseState.BUILDING_PLACEMENT);
+            }
         }
     }
 
@@ -60,13 +67,18 @@ public class BuildCommand : Command, Icommand
         InitializeCommand();
     }
 
-    private void TryToBuild(Vector3 potentialPlacement)
+    private void TryToBuild(RaycastHit potentialPlacement)
     {
-        if(SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType == UnitType.Worker)
+        Vector3 position = potentialPlacement.point;
+        if(!CanBuildUnit())
+        {
+            return;
+        }
+        if(SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType == UnitType.Worker && MouseManager.main.IsLegalPosition())
         {
             if (isReadyForPlacement == true)
             {
-                this.point = potentialPlacement;
+                this.point = position;
                 SelectionManager.main.FirstUnit().gameObject.GetComponent<Unit>().Command(this);
                 UiManager.main.CheckFirstUnit();
                 isReadyForPlacement = false;
@@ -74,7 +86,7 @@ public class BuildCommand : Command, Icommand
                 MouseManager.main.SetState(MouseState.DEFAULT);
             }
         }
-        else
+        else if(SelectionManager.main.FirstUnit().GetComponent<RtsObject>().unitType == UnitType.Building)
         {
             if (isReadyForPlacement == true)
             {
@@ -94,6 +106,10 @@ public class BuildCommand : Command, Icommand
                 MouseManager.main.SetState(MouseState.DEFAULT);
             }
         }
+        else
+        {
+            return;
+        }
     }
 
     private void CancelTryToBuild(Vector3 point)
@@ -105,5 +121,37 @@ public class BuildCommand : Command, Icommand
     public GameObject GetUnit()
     {
         return Unit;
+    }
+
+    private bool CanBuildUnit()
+    {
+        if(!SelectionManager.main.FirstUnit())
+        {
+            return false;
+        }
+        if(!GetUnit().GetComponent<RtsObject>().GetItem().isAvailable)
+        {
+            return false;
+        }
+        PlayerUnitController player = SelectionManager.main.FirstUnit().GetComponent<RtsObjectController>().GetPlayer().GetComponent<PlayerUnitController>();
+        int totalGold = player.GetComponent<PlayerController>().gold;
+        int totalLumber = player.GetComponent<PlayerController>().lumber;
+
+        if(GetUnit().GetComponent<Unit>().unitType != UnitType.Building && (GetUnit().GetComponent<Unit>().GetItem().food + player.unitsExisting) > player.allowedUnits)
+        {
+            return false;
+        }
+
+        if(GetUnit().GetComponent<Unit>().GetItem().Cost > totalGold || GetUnit().GetComponent<Unit>().GetItem().Lumber > totalLumber)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public int GetBuildTime()
+    {
+        return (int)GetUnit().GetComponent<Unit>().GetItem().BuildTime;
     }
 }

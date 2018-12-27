@@ -2,10 +2,10 @@ Initialize engine version: 5.6.1f1 (2860b30f0b54)
 GfxDevice: creating device client; threaded=1
 Direct3D:
     Version:  Direct3D 11.0 [level 11.0]
-    Renderer: NVIDIA GeForce GTX 770 (ID=0x1184)
+    Renderer: NVIDIA GeForce GTX 1080 (ID=0x1b80)
     Vendor:   NVIDIA
     VRAM:     3072 MB
-    Driver:   24.21.13.9793
+    Driver:   25.21.14.1634
 Begin MonoManager ReloadAssembly
 Platform assembly: E:\GitHub\perilous\Throne\Throne\Server\test_Data\Managed\UnityEngine.dll (this message is harmless)
 Loading E:\GitHub\perilous\Throne\Throne\Server\test_Data\Managed\UnityEngine.dll into Unity Child Domain
@@ -23,27 +23,9 @@ Platform assembly: E:\GitHub\perilous\Throne\Throne\Server\test_Data\Managed\web
 Loading E:\GitHub\perilous\Throne\Throne\Server\test_Data\Managed\websocket-sharp.dll into Unity Child Domain
 Platform assembly: E:\GitHub\perilous\Throne\Throne\Server\test_Data\Managed\BarebonesLogger.dll (this message is harmless)
 Loading E:\GitHub\perilous\Throne\Throne\Server\test_Data\Managed\BarebonesLogger.dll into Unity Child Domain
-- Completed reload, in  0.020 seconds
+- Completed reload, in  0.129 seconds
 Platform assembly: E:\GitHub\perilous\Throne\Throne\Server\test_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: E:\GitHub\perilous\Throne\Throne\Server\test_Data\Managed\System.dll (this message is harmless)
 desktop: 1920x1080 120Hz; virtual: 3520x1080 at -1600,0
 <RI> Initializing input.
 <RI> Input initialized.
-<RI> Initialized touch support.
-Shader 'MicroSplat/Terrain': dependency 'AddPassShader' shader 'Hidden/MicroSplat/AddPass' not found
-UnloadTime: 1.079538 ms
-Setting up 2 worker threads for Enlighten.
-  Thread -> id: 1d4b8 -> priority: 1 
-  Thread -> id: 1d598 -> priority: 1 
-RPC: This is  Server
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-NullReferenceException: Object reference not set to an instance of an object
-  at Utils.GetViewportBounds (UnityEngine.Camera camera, Vector3 screenPosition1, Vector3 screenPosition2) [0x00000] in <filename unknown>:0 
-  at EventsManager.SelectionComplete () [0x00000] in <filename unknown>:0 
-  at EventsManager.CheckMouseClicks () [0x00000] in <filename unknown>:0 
-  at EventsManager.LateUpdate () [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-

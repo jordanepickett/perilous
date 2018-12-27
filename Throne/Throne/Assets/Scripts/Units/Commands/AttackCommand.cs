@@ -25,7 +25,7 @@ public class AttackCommand : Command, Icommand
 
     public AttackCommand()
     {
-        EventsManager.main.RightMouseClickObject += GiveAttackCommand;
+        EventsManager.main.RightMouseClickUnit += GiveAttackCommand;
         unitCommand = UnitCommands.Attack;
         SetKeyBind(KeyCode.A);
     }
@@ -65,7 +65,7 @@ public class AttackCommand : Command, Icommand
         if (point.collider.gameObject.GetComponent<RtsObjectController>())
         {
             Debug.Log("HERE");
-            if (point.collider.gameObject.GetComponent<RtsObjectController>().Team != SelectionManager.main.FirstUnit().GetComponent<RtsObjectController>().Team)
+            if (point.collider.gameObject.GetComponent<RtsObjectController>().teamId != SelectionManager.main.FirstUnit().GetComponent<RtsObjectController>().teamId)
             {
                 SetUnit(point.collider.gameObject);
                 SelectionManager.main.GiveAllUnitsCommand(this);

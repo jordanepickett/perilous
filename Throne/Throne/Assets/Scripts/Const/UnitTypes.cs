@@ -2,7 +2,10 @@
 {
     Worker,
     Building,
-    Infantry
+    Infantry,
+    Archer,
+    Knight,
+    Upgrade
 }
 
 public enum BuildingType

@@ -11,9 +11,15 @@ public abstract class RtsObject : NetworkBehaviour {
 
     protected bool isDeployed;
 
+    [SyncVar]
+    public int health;
+
+    [SyncVar]
+    public int armor;
+
     [SerializeField]
     [SyncVar(hook = "OnHealthChange")]
-    public int health;
+    public int currentHealth;
 
     private Item item;
 
@@ -28,6 +34,8 @@ public abstract class RtsObject : NetworkBehaviour {
     {
         item = newItem;
         health = (int)newItem.Health;
+        armor = (int)newItem.Armour;
+        currentHealth = health;
     }
 
     public bool IsDeployed()
@@ -70,8 +78,41 @@ public abstract class RtsObject : NetworkBehaviour {
         UiManager.main.ClearUnitPanel();
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        //health = (int)GetItem().Health;
+        currentHealth = health;
+    }
+
     public void OnHealthChange(int health)
     {
-        Debug.Log(health);
+        currentHealth = health;
+        if(currentHealth > this.health)
+        {
+            currentHealth = this.health;
+        }
+
+        UpdateUIHealth();
+    }
+
+    public Sprite GetUnitImage()
+    {
+        return GetItem().ItemImage;
+    }
+
+    void UpdateUIHealth()
+    {
+        GetComponent<RtsObjectController>().healthBar.fillAmount = Utils.Map(currentHealth, this.health);
+
+        if (SelectionManager.main.GetSelectedUnits().Count > 0 && SelectionManager.main.FirstUnit() == GetComponent<SelectableUnit>())
+        {
+            UpdateUnitPortrait();
+        }
+    }
+
+    void UpdateUnitPortrait()
+    {
+        UiManager.main.unitPortrait.UpdatePortraitHealthAndMana(currentHealth, health, currentHealth, health);
     }
 }

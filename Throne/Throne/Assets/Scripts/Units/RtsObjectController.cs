@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class RtsObjectController : NetworkBehaviour
 {
@@ -21,10 +22,17 @@ public class RtsObjectController : NetworkBehaviour
     [SyncVar]
     public GameObject ParentObject;
 
+    public GameObject localPlayer;
+
     public Team Team
     {
         get; set;
     }
+
+    [SyncVar]
+    public bool instantSpawn = false;
+
+    public Image healthBar;
 
     [SerializeField]
     [SyncVar(hook = "OnColor")]
@@ -52,6 +60,7 @@ public class RtsObjectController : NetworkBehaviour
     void OnPlayer(GameObject obj)
     {
         player = obj;
+        GetComponent<FactionA>().SyncUnitAvailability();
     }
 
     private void Awake()
@@ -62,7 +71,14 @@ public class RtsObjectController : NetworkBehaviour
 
     public void OnItem(int itemId)
     {
-        CmdSetUnitItem(itemId);
+        if(hasAuthority)
+        {
+            CmdSetUnitItem(itemId);
+        }
+        else
+        {
+            SetUnitItem(itemId);
+        }
     }
 
     [Command]
@@ -84,18 +100,26 @@ public class RtsObjectController : NetworkBehaviour
         {
             if (itemId == item.ID)
             {
-                Debug.Log("ITEM NAME = " + item.Name);
+                //Debug.Log("ITEM NAME = " + item.Name);
+                //Debug.Log("ITEM COST = " + item.Lumber);
                 GetComponent<RtsObject>().SetItem(item);
-                if(isServer)
+                if (isServer)
                 {
                     damage = (int)item.attack.damage;
+                    GetPlayer().GetComponent<PlayerController>().RemoveGold(item.Cost);
+                    GetPlayer().GetComponent<PlayerController>().RemoveLumber(item.Lumber);
                 }
-                GetComponent<Unit>().DeployPlacement();
-                if(ParentObject && 
+                if (!instantSpawn)
+                {
+                    GetComponent<Unit>().DeployPlacement();
+                }
+                if(ParentObject && ParentObject.GetComponent<RtsObject>() &&
                     (ParentObject.GetComponent<Unit>().unitType == UnitType.Worker || (ParentObject.GetComponent<Unit>().unitType == UnitType.Building)))
                 {
                     StartCoroutine(ParentObject.GetComponent<Unit>().BuildingLength(GetComponent<RtsObject>().GetItem().BuildTime));
                 }
+
+                break;
             }
         }
     }
@@ -107,7 +131,14 @@ public class RtsObjectController : NetworkBehaviour
 
     public void OnTeam(int teamId)
     {
-        CmdSetTeam(teamId);
+        if(hasAuthority)
+        {
+            CmdSetTeam(teamId);
+        }
+        else
+        {
+            SetTeam(teamId);
+        }
     }
 
     [Command]
@@ -150,6 +181,11 @@ public class RtsObjectController : NetworkBehaviour
     {
         //Fetch the Renderer from the GameObject
         Renderer rend = GetComponent<Renderer>();
+        var renderes = GetComponentsInChildren<Renderer>();
+        foreach(var rendered in renderes)
+        {
+            rendered.material.SetColor("_Color", color);
+        }
 
         //Set the main Color of the Material to green
         //rend.material.shader = Shader.Find("_Color");
@@ -158,7 +194,8 @@ public class RtsObjectController : NetworkBehaviour
 
     public void OnDamage(int damage)
     {
-        CmdSetUnitAttack(damage);
+        if(hasAuthority)
+            CmdSetUnitAttack(damage);
     }
 
     [Command]
@@ -176,11 +213,11 @@ public class RtsObjectController : NetworkBehaviour
 
     public void SetUnitAttack(int damage)
     {
-        Debug.Log("SETTING DAMAGE " + damage);
         UnitAttack unitAttack = GetComponent<UnitAttack>();
         RtsObject obj = GetComponent<RtsObject>();
         //GetComponent<UnitAttack>().DamageType = (DamageType)damage;
         unitAttack.damage = damage;
+        Debug.Log(obj.GetItem());
         unitAttack.piercingDamage = obj.GetItem().attack.piercingDamage;
         unitAttack.range = obj.GetItem().attack.range;
         unitAttack.attackSpeed = obj.GetItem().attack.attackSpeed;
@@ -191,6 +228,8 @@ public class RtsObjectController : NetworkBehaviour
     public override void OnStartClient()
     {
         SetColor(color);
+        GetComponent<FoW.FogOfWarUnit>().team = teamId;
+        GetComponent<FoW.HideInFog>().team = teamId;
     }
 
     public bool isSameTeam(RtsObjectController objController)
@@ -200,5 +239,15 @@ public class RtsObjectController : NetworkBehaviour
             return false;
         }
         return true;
+    }
+
+    public void SetVisible()
+    {
+        GetComponent<Renderer>().enabled = true;
+    }
+
+    public void SetInvisible()
+    {
+        GetComponent<Renderer>().enabled = false;
     }
 }
