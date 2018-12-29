@@ -13,7 +13,7 @@ public class TGMapInspector : Editor {
         if(GUILayout.Button("Regenerate"))
         {
             TGMap tileMap = (TGMap)target;
-            tileMap.BuildMesh();
+            tileMap.BuildNewMesh();
         }
     }
 }

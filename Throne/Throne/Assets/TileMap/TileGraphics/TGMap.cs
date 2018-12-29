@@ -36,8 +36,8 @@ public class TGMap : MonoBehaviour {
     public GameObject brushButton;
 
     public Mesh mesh;
+    public MeshCollider meshCollider;
 
-    public GameObject wall;
 
     // Use this for initialization
     void Start () {
@@ -152,7 +152,7 @@ public class TGMap : MonoBehaviour {
         // Assign our mesh to our filter/renderer/collider
         MeshFilter meshFilter = GetComponent<MeshFilter>();
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
-        MeshCollider meshCollider = GetComponent<MeshCollider>();
+        meshCollider = GetComponent<MeshCollider>();
 
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
@@ -373,7 +373,7 @@ public class TGMap : MonoBehaviour {
         int xPos = (int)test.x;
         int zPos = (int)test.z;
 
-        for(int h = 0; h < splitVerts.Length; h++)
+        for (int h = 0; h < splitVerts.Length; h++)
         {
             for (int index = 0; index < splitVerts[h].Length; index++)
             {
@@ -383,13 +383,25 @@ public class TGMap : MonoBehaviour {
                 if (distance < radius)
                 {
                     newVert = splitVerts[h][index];
-                    Debug.Log(index);
                     newVert.y = 1;
                     splitVerts[h][index] = newVert;
 
                 }
 
             }
+        }
+
+        TDTile botLeft = map.GetTile(xPos - 1, zPos - 1);
+        TDTile botRight = map.GetTile(xPos, zPos - 1);
+        TDTile topLeft = map.GetTile(xPos - 1, zPos);
+        TDTile topRight = map.GetTile(xPos, zPos);
+        TDTile[] tilesArray = new TDTile[] { botLeft, botRight, topLeft, topRight };
+        int[,] tilePos = new int[4, 2] { { xPos - 1, zPos - 1 }, { xPos, zPos - 1 }, { xPos - 1, zPos }, { xPos, zPos } };
+        int[,] cliffPos = new int[4, 2] { { xPos - 1, zPos - 1 }, { xPos + 1, zPos - 1 }, { xPos - 1, zPos + 1 }, { xPos + 1, zPos + 1 } };
+
+        if (botLeft.vertices[1].layerHeight == VertexLayerHeight.ONE)
+        {
+            return;
         }
 
         List<Vector3> haha = new List<Vector3>();
@@ -407,19 +419,7 @@ public class TGMap : MonoBehaviour {
         mesh.vertices = newVerts;
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
-
-        TDTile botLeft = map.GetTile(xPos - 1, zPos - 1);
-        TDTile botRight = map.GetTile(xPos, zPos - 1);
-        TDTile topLeft = map.GetTile(xPos - 1, zPos);
-        TDTile topRight = map.GetTile(xPos, zPos);
-        TDTile[] tilesArray = new TDTile[] { botLeft, botRight, topLeft, topRight };
-        int[,] tilePos = new int[4, 2] { { xPos - 1, zPos - 1 }, { xPos, zPos - 1 }, { xPos - 1, zPos }, { xPos, zPos } };
-        int[,] cliffPos = new int[4, 2] { { xPos - 1, zPos - 1 }, { xPos + 1, zPos - 1 }, { xPos - 1, zPos + 1 }, { xPos + 1, zPos + 1} };
-
-        if (botLeft.vertices[1].layerHeight == VertexLayerHeight.ONE)
-        {
-            return;
-        }
+        meshCollider.sharedMesh = mesh;
 
         botLeft.vertices[1].layerHeight = VertexLayerHeight.ONE;
         botRight.vertices[0].layerHeight = VertexLayerHeight.ONE;
@@ -583,23 +583,26 @@ public class TGMap : MonoBehaviour {
             }
         }
 
-        Vector3 test = new Vector3(nearestVertex.x + 1, 0, nearestVertex.z);
-        Vector3 test1 = new Vector3(nearestVertex.x + 1, 0, nearestVertex.z + 1);
-        Vector3 test4 = new Vector3(nearestVertex.x + 1, 0, nearestVertex.z - 1);
-        Vector3 test2 = new Vector3(nearestVertex.x, 0, nearestVertex.z + 1);
-        Vector3 test5 = new Vector3(nearestVertex.x, 0, nearestVertex.z - 1);
-        Vector3 test3 = new Vector3(nearestVertex.x - 1, 0, nearestVertex.z);
-        Vector3 test6 = new Vector3(nearestVertex.x - 1, 0, nearestVertex.z + 1);
-        Vector3 test7 = new Vector3(nearestVertex.x - 1, 0, nearestVertex.z - 1);
+        for(int i = 1; i < Brush.main.GetBrushSize(); i++)
+        {
+            Vector3 test = new Vector3(nearestVertex.x + i, 0, nearestVertex.z);
+            Vector3 test1 = new Vector3(nearestVertex.x + i, 0, nearestVertex.z + i);
+            Vector3 test4 = new Vector3(nearestVertex.x + i, 0, nearestVertex.z - i);
+            Vector3 test2 = new Vector3(nearestVertex.x, 0, nearestVertex.z + i);
+            Vector3 test5 = new Vector3(nearestVertex.x, 0, nearestVertex.z - 1);
+            Vector3 test3 = new Vector3(nearestVertex.x - i, 0, nearestVertex.z);
+            Vector3 test6 = new Vector3(nearestVertex.x - i, 0, nearestVertex.z + i);
+            Vector3 test7 = new Vector3(nearestVertex.x - i, 0, nearestVertex.z - i);
+            vList.Add(test);
+            vList.Add(test1);
+            vList.Add(test2);
+            vList.Add(test3);
+            vList.Add(test4);
+            vList.Add(test5);
+            vList.Add(test6);
+            vList.Add(test7);
+        }
         vList.Add(nearestVertex);
-        vList.Add(test);
-        vList.Add(test1);
-        vList.Add(test2);
-        vList.Add(test3);
-        vList.Add(test4);
-        vList.Add(test5);
-        vList.Add(test6);
-        vList.Add(test7);
 
         return vList;
     }

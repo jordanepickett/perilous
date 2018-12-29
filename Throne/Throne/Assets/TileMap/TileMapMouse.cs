@@ -35,12 +35,15 @@ public class TileMapMouse : MonoBehaviour {
         {
             int x = Mathf.FloorToInt(hit.point.x / tileMap.tileSize);
             int z = Mathf.FloorToInt(hit.point.z / tileMap.tileSize);
+            int y = Mathf.CeilToInt(hit.point.y);
+            Debug.Log(hit.point);
             //Debug.Log("Tile: " + x + ", " + z);
 
             currentTileCoord.x = x;
             currentTileCoord.z = z;
+            //currentTileCoord.y = y;
 
-            selectionCube.transform.position = currentTileCoord * 1f;
+            selectionCube.transform.position = currentTileCoord * 1;
 
             if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
             {
@@ -64,6 +67,7 @@ public class TileMapMouse : MonoBehaviour {
 
     void BrushCliff()
     {
+        Debug.Log(currentTileCoord);
         int index = map.NearestVertexIndexTo(currentTileCoord);
         map.ModifyVertices(currentTileCoord);
     }

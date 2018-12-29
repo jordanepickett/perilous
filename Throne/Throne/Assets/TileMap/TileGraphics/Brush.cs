@@ -13,20 +13,32 @@ public class Brush : MonoBehaviour {
 
     public BrushState brushState = BrushState.TEXTURE;
     public Button brushToggle;
+    public Slider brushSizeSlider;
+    public static Brush main;
+
+    private int brushSize;
+
+    public int GetBrushSize()
+    {
+        return brushSize;
+    }
+
+    public void SetBrushSize()
+    {
+        Debug.Log(brushSizeSlider.value);
+        brushSize = (int)brushSizeSlider.value;
+    }
 
 	// Use this for initialization
 	void Start () {
-        SetListener();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+        SetListeners();
+        main = this;
 	}
 
-    void SetListener()
+    void SetListeners()
     {
         brushToggle.GetComponent<Button>().onClick.AddListener(delegate { SetState(); });
+        brushSizeSlider.onValueChanged.AddListener(delegate { SetBrushSize(); });
     }
 
     void SetState()
