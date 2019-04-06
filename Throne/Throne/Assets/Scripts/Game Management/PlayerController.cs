@@ -110,9 +110,9 @@ public class PlayerController : NetworkBehaviour
 
     }
 
-    void OnNetworkInstantiate(NetworkMessageInfo info)
+    void OnNetworkInstantiate()
     {
-        if (GetComponent<NetworkView>().isMine)
+        if (isLocalPlayer)
         {
             MainCamera.main.enabled = true;
             Debug.Log("camera enabled");
@@ -229,14 +229,14 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    void OnPlayerDisconnected(NetworkPlayer player)
+    void OnPlayerDisconnected(NetworkIdentity player)
     {
         CustomNetworkManager.singleton.GetComponent<PlayersContainer>().RemovePlayer(gameObject);
         RpcRemovePlayer(gameObject);
         Debug.Log("Clean up after player " + player);
 
-        Network.RemoveRPCs(player);
-        Network.DestroyPlayerObjects(player);
+        //Network.RemoveRPCs(player);
+        //Network.DestroyPlayerObjects(player);
     }
 
     [ClientRpc]

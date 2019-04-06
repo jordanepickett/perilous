@@ -12,6 +12,11 @@ public enum TileType
 
 public class TDTile {
 
+    public const int TOP_LEFT_VERTEX = 0;
+    public const int TOP_RIGHT_VERTEX = 1;
+    public const int BOT_RIGHT_VERTEX = 2;
+    public const int BOT_LEFT_VERTEX = 3;
+
     public TileType type = TileType.GROUND;
 
     public TDVertex[] vertices = new TDVertex[4];
@@ -55,16 +60,12 @@ public class TDTile {
         return sortedList;
     }
 
-    public string GetVertexCliff()
+    public string GetVertexCliff(int baseHeight)
     {
-        //char fileName = (char)('A' + vertices[0].layerHeight)
-        //                    + (char)('A' + vertices[1].layerHeight)
-        //                    + (char)('A' + vertices[2].layerHeight)
-        //                    + (char)('A' + vertices[3].layerHeight);
-        string fileName = "" + (char)('A' + (int)(vertices[0].layerHeight - 3))
-                        + (char)('A' + (int)(vertices[1].layerHeight - 3))
-                        + (char)('A' + (int)(vertices[2].layerHeight - 3))
-                        + (char)('A' + (int)(vertices[3].layerHeight - 3));
+        string fileName = "" + (char)('A' + (int)(vertices[0].height - baseHeight))
+                        + (char)('A' + (int)(vertices[1].height - baseHeight))
+                        + (char)('A' + (int)(vertices[2].height - baseHeight))
+                        + (char)('A' + (int)(vertices[3].height - baseHeight));
         return fileName;
     }
 }

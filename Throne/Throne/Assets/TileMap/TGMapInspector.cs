@@ -10,10 +10,10 @@ public class TGMapInspector : Editor {
     {
         base.OnInspectorGUI();
         
-        if(GUILayout.Button("Regenerate"))
-        {
-            TGMap tileMap = (TGMap)target;
-            tileMap.BuildNewMesh();
-        }
+        //if(GUILayout.Button("Regenerate"))
+        //{
+        //    TGMap tileMap = (TGMap)target;
+        //    tileMap.BuildNewMesh(new TileMapDTO());
+        //}
     }
 }

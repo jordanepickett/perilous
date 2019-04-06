@@ -193,7 +193,7 @@ public class ServerHUD : MonoBehaviour {
 
             //getting the ip from the pc the server is running on. (a local Lan address) 
             //onely used to connect from inside your house/network.
-            localIP = Network.player.ipAddress;
+            //localIP = Network.player.ipAddress;
 
             getIP.GetComponentInChildren<Text>().text = "Server IP Address\nExternal :" + externalip+"\nLocal :"+localIP;
             //saving the ip addresses.
