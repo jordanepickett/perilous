@@ -13,6 +13,21 @@ public class CreateMapInfo : MonoBehaviour {
 
     public Button CreateNewMap;
 
+    public string GetMapName()
+    {
+        return mapName.text;
+    }
+
+    public string GetMapSizeX()
+    {
+        return sizeX.text;
+    }
+
+    public string GetMapSizeZ()
+    {
+        return sizeZ.text;
+    }
+
     private void Start()
     {
         SetListeners();

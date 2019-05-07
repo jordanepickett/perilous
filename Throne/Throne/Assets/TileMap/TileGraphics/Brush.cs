@@ -9,7 +9,8 @@ public enum BrushState
     CLIFFS,
     TEXTURE,
     VERTEX,
-    OBJECTS
+    OBJECTS,
+    RAMPS
 }
 
 public delegate void ChangedBrushState(BrushState newState);

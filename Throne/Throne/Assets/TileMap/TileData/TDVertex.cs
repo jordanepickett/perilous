@@ -33,6 +33,7 @@ public class TDVertex {
     public int value;
     public int height = 0;
     public Vertex3 vertex;
+    public bool ramp = false;
 
     public TDVertex()
     {
@@ -46,5 +47,10 @@ public class TDVertex {
         vertex.x = x;
         vertex.y = y;
         vertex.z = z;
+    }
+
+    public Vertex3 GetVertices()
+    {
+        return vertex;
     }
 }

@@ -1,8 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class GenerateMesh : TGMap {
+
+    public void Start()
+    {
+        renderer = GetComponent<Renderer>();
+    }
 
     public void CreateMesh(TileMapDTO tileMapDTO, int offsetX, int offsetZ)
     {
@@ -23,6 +29,7 @@ public class GenerateMesh : TGMap {
 
         int vSizeX = sizeX + 1;
         int vSizeZ = sizeZ + 1;
+        vMapSize = vSizeX;
         //int numVerts = vSizeX * vSizeZ * 4;
         int numVerts = vSizeX * vSizeZ;
 

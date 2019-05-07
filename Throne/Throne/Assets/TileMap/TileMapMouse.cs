@@ -36,6 +36,10 @@ public class TileMapMouse : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
@@ -49,28 +53,20 @@ public class TileMapMouse : MonoBehaviour {
             currentTileCoord.z = z;
             //print("X POS: " + currentTileCoord.x + " Z POS: " + currentTileCoord.z);
 
-            if(Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0))
             {
-                maps.Clear();
+
                 if (hit.collider.gameObject.GetComponent<TGMap>())
                 {
-                    //map = hit.collider.gameObject.GetComponent<TGMap>();
+                    map = hit.collider.gameObject.GetComponent<TGMap>();
                 }
                 currentTileCoord.y = y;
-                if(Brush.main.brushState == BrushState.VERTEX)
-                {
-                    SetMaps();
-                }
+
                 if(Brush.main.brushState == BrushState.TEXTURE)
                 {
                     BrushTexture();
                 }
                 test = currentTileCoord;
-            }
-
-            if(hit.collider.gameObject.GetComponent<TGMap>())
-            {
-                map = hit.collider.gameObject.GetComponent<TGMap>();
             }
             //Debug.Log(currentTileCoord);
 
@@ -78,6 +74,11 @@ public class TileMapMouse : MonoBehaviour {
 
             if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
             {
+                if (Brush.main.brushState == BrushState.VERTEX || Brush.main.brushState == BrushState.CLIFFS || Brush.main.brushState == BrushState.TEXTURE)
+                {
+                    //maps.Clear();
+                    //SetMaps();
+                }
                 switch (brush.brushState)
                 {
                     case (BrushState.CLIFFS):
@@ -95,6 +96,9 @@ public class TileMapMouse : MonoBehaviour {
                         break;
                     case (BrushState.OBJECTS):
                         ObjectPlacement();
+                        break;
+                    case (BrushState.RAMPS):
+                        PlaceRamp();
                         break;
                     default:
                         BrushTexture();
@@ -131,14 +135,46 @@ public class TileMapMouse : MonoBehaviour {
 
     void BrushTexture()
     {
-        List<Vector3> test = map.NearestVertecesTo(currentTileCoord);
-        map.AddTextureToTerrain(test);
+        int radius = Brush.main.GetBrushSize();
+        Vector3 startPoint = new Vector3(currentTileCoord.x - radius, currentTileCoord.y, currentTileCoord.z - radius);
+        List<Vector3> vectorList = new List<Vector3>();
+        for (int z = 0; z < radius; z++)
+        {
+            for (int x = 0; x < radius; x++)
+            {
+                Vector3 point = new Vector3(currentTileCoord.x + x, currentTileCoord.y, currentTileCoord.z + z);
+                SetMaps(point);
+                vectorList.Add(point);
+            }
+        }
+
+        foreach (var map in maps)
+        {
+            map.AddTextureToTerrain(vectorList);
+        }
     }
 
     void BrushCliff()
     {
-        //int index = map.NearestVertexIndexTo(currentTileCoord);
-        map.AddCliff(currentTileCoord, CliffHeight());
+        int radius = Brush.main.GetBrushSize();
+        Vector3 startPoint = new Vector3(currentTileCoord.x - radius, currentTileCoord.y, currentTileCoord.z - radius);
+        for (int z = 0; z < radius; z++)
+        {
+            for (int x = 0; x < radius; x++)
+            {
+                Vector3 point = new Vector3(currentTileCoord.x + x, currentTileCoord.y, currentTileCoord.z + z);
+                SetMaps(point);
+                foreach (var map in maps)
+                {
+                    map.AddCliff(point, CliffHeight());
+                }
+            }
+        }
+    }
+
+    void PlaceRamp()
+    {
+        map.AddRamp(new Vector3(currentTileCoord.x, 0, currentTileCoord.z));
     }
 
     int CliffHeight()
@@ -159,9 +195,19 @@ public class TileMapMouse : MonoBehaviour {
         {
             lowerHeight = true;
         }
-        foreach (var map in maps)
+        int radius = Brush.main.GetBrushSize();
+        Vector3 startPoint = new Vector3(currentTileCoord.x - radius, currentTileCoord.y, currentTileCoord.z - radius);
+        for(int z = 0; z < radius; z++)
         {
-            map.ModifyVerteces(currentTileCoord, lowerHeight);
+            for(int x = 0; x < radius; x++)
+            {
+                Vector3 point = new Vector3(currentTileCoord.x + x, currentTileCoord.y, currentTileCoord.z + z);
+                SetMaps(point);
+                foreach (var map in maps)
+                {
+                    map.ModifyVerteces(point, lowerHeight);
+                }
+            }
         }
     }
 
@@ -196,10 +242,11 @@ public class TileMapMouse : MonoBehaviour {
         }
     }
 
-    void SetMaps()
+    void SetMaps(Vector3 point)
     {
-        Vector3 center = currentTileCoord;
-        Collider[] hitColliders = Physics.OverlapSphere(center, 15f);
+        maps.Clear();
+        Vector3 center = point;
+        Collider[] hitColliders = Physics.OverlapSphere(center, 0.9f);
         int i = 0;
         for (i = 0; i < hitColliders.Length; i++)
         {

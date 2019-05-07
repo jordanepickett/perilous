@@ -24,16 +24,19 @@ public class MapEditorManager : MonoBehaviour {
 
     private int chunks = 4;
     public GameObject mapChunk;
+    private List<GenerateMesh> mapChunks;
 
     public VertexType vType = VertexType.ONE;
 
 
     // Use this for initialization
     void Start () {
+        //Application.targetFrameRate = 60;
         main = this;
         SetState(MapEditorState.MAIN_MENU);
 
         mapInfo = GetComponent<CreateMapInfo>();
+        mapChunks = new List<GenerateMesh>();
 	}
 
     public MapEditorState GetState()
@@ -82,6 +85,7 @@ public class MapEditorManager : MonoBehaviour {
             {
                 GameObject tempObject = (GameObject)Instantiate(mapChunk, new Vector3(x * mapSizeX, 0, z * mapSizeZ), Quaternion.identity);
                 tempObject.GetComponent<GenerateMesh>().CreateMesh(tileMapDto, x * mapSizeX, z * mapSizeZ);
+                mapChunks.Add(tempObject.GetComponent<GenerateMesh>());
             }
         }
 
@@ -105,6 +109,17 @@ public class MapEditorManager : MonoBehaviour {
             int copy = i;
             selection.GetComponent<Button>().onClick.AddListener(delegate { SetBrush(copy); });
             selection.GetComponentInChildren<Text>().text = i.ToString();
+        }
+    }
+
+    public void Save()
+    {
+        print(mapInfo.GetMapName());
+        print(mapInfo.GetMapSizeX());
+        print(mapInfo.GetMapSizeZ());
+        foreach(GenerateMesh mapChunk in mapChunks)
+        {
+            print(mapChunk);
         }
     }
 

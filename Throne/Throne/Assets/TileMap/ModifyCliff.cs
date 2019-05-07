@@ -59,13 +59,14 @@ public class ModifyCliff : MonoBehaviour
         Vector3[] normals = mesh.normals;
         t.x = Mathf.RoundToInt(t.x / 1);
         t.z = Mathf.RoundToInt(t.z / 1);
+        //print(t);
 
         //vertices[5].z += .001f;
 
         //Vector3 w = transform.TransformPoint(vertices[3]);
         //float distance = Vector3.Distance(w, t);
         //print(distance);
-        float radius = .2f;
+        float radius = .3f;
 
         for (int index = 0; index < vertices.Length; index++)
         {
