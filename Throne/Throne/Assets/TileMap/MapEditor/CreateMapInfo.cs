@@ -7,9 +7,9 @@ public class CreateMapInfo : MonoBehaviour {
 
     public InputField mapName;
 
-    public InputField sizeX;
+    public Dropdown sizeX;
 
-    public InputField sizeZ;
+    public Dropdown sizeZ;
 
     public Button CreateNewMap;
 
@@ -20,12 +20,12 @@ public class CreateMapInfo : MonoBehaviour {
 
     public string GetMapSizeX()
     {
-        return sizeX.text;
+        return sizeX.options[sizeX.value].text;
     }
 
     public string GetMapSizeZ()
     {
-        return sizeZ.text;
+        return sizeZ.options[sizeZ.value].text;
     }
 
     private void Start()
@@ -36,8 +36,8 @@ public class CreateMapInfo : MonoBehaviour {
     public TileMapDTO GetNewMapInfo()
     {
         string name = mapName.text;
-        int sizeX = int.Parse(this.sizeX.text);
-        int sizeZ = int.Parse(this.sizeZ.text);
+        int sizeX = int.Parse(this.sizeX.options[this.sizeX.value].text);
+        int sizeZ = int.Parse(this.sizeZ.options[this.sizeZ.value].text);
 
         return new TileMapDTO(name, sizeX, sizeZ);
     }

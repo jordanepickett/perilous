@@ -21,12 +21,19 @@ public class TGMap : MonoBehaviour, ModifableInterface {
     protected TDMap map;
     protected TDVertexMap vertexMap;
     protected Vector3[] verts;
+    protected Vector3[] displacedVerts;
+    protected Vector3[] vertexVelocities;
+    public float springForce = 20f;
+    protected float damping = 1f;
     protected Vector3[][] splitVerts;
 
     protected int textWidth;
     protected int textHeight;
     protected Texture2D texture;
+    RenderTexture rt;
     public int vMapSize;
+    public Texture2D alphaTexture;
+    public Camera c;
 
     Color[][] tiles;
     Color[][] grass;
@@ -49,7 +56,7 @@ public class TGMap : MonoBehaviour, ModifableInterface {
     public void CreateNewTerrain(TileMapDTO tileMapDto)
     {
         CreateSpriteTiles();
-        CreateTerrainTexture(tileMapDto);
+        //CreateTerrainTexture(tileMapDto);
 
         BuildNewMesh(tileMapDto);
         ChangeTextureBrush();
@@ -199,7 +206,8 @@ public class TGMap : MonoBehaviour, ModifableInterface {
 
     public void BuildTexture(TileMapDTO tileMapDTO)
     {
-
+        SetTerrainTexture();
+        List<Vector3> test = new List<Vector3>();
         //FIXME
         int sizeY = tileMapDTO.GetSizeZ();
         int sizeX = tileMapDTO.GetSizeX();
@@ -208,22 +216,23 @@ public class TGMap : MonoBehaviour, ModifableInterface {
 
             for(int x = 0; x < sizeX; x++)
             {
-                Color[] colorArray = GetSpriteTile(0, 0);
+                test.Add(new Vector3(x, 0, y));
+                //Color[] colorArray = GetSpriteTile(0, 0);
                 //Color[] colorArray = spriteTiles[0][0];
 
-                texture.filterMode = FilterMode.Trilinear;
-                texture.alphaIsTransparency = true;
+                //texture.filterMode = FilterMode.Point;
+                //texture.alphaIsTransparency = true;
 
-                texture.SetPixels(x * TILE_RESOLUTION, y * TILE_RESOLUTION, TILE_RESOLUTION, TILE_RESOLUTION, colorArray);
+                //texture.SetPixels(x * TILE_RESOLUTION, y * TILE_RESOLUTION, TILE_RESOLUTION, TILE_RESOLUTION, colorArray);
             }
         }
 
-        texture.Apply();
+        AddTextureToTerrain(test, VertexType.TWO);
 
-        SetTerrainTexture(texture);
+        //texture.Apply();
     }
 
-    void SetTerrainTexture(Texture texture)
+    void SetTerrainTexture()
     {
         //Find the Standard Shader
         //Material myNewMaterial = new Material(Shader.Find("Standard"));
@@ -244,9 +253,26 @@ public class TGMap : MonoBehaviour, ModifableInterface {
         //meshRenderer.sharedMaterial.mainTexture = texture;
         //Renderer m_Renderer = GetComponent<Renderer>();
 
-        renderer.material.SetTexture("_MainTex", texture);
-        renderer.material.EnableKeyword("_ALPHABLEND_ON");
-        renderer.material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+        //renderer.material.SetTexture("_MainTex", texture);
+        //renderer.material.EnableKeyword("_ALPHABLEND_ON");
+        //renderer.material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+
+        rt = new RenderTexture(sizeX * TILE_RESOLUTION, sizeZ * TILE_RESOLUTION, 32, RenderTextureFormat.ARGB32);           //Create RenderTexture 512x512 pixels in size.
+        GetComponent<Renderer>().material.SetTexture("_MainTex", rt);   //Assign my RenderTexure to be the main texture of my object.
+        //Graphics.Blit(texture, rt);                     //Blit my starting texture to my RenderTexture.
+        //c = GameObject.FindGameObjectWithTag("RenderCamera").GetComponent<Camera>();
+        //c.targetTexture = rt;
+
+        //c.Render();
+
+        Color[] colors = new Color[TILE_RESOLUTION * TILE_RESOLUTION];
+        for(int i = 0; i < colors.Length; i++)
+        {
+            colors[i] = new Color(0, 0, 0, 0f);
+        }
+        alphaTexture = new Texture2D(TILE_RESOLUTION, TILE_RESOLUTION);
+        alphaTexture.SetPixels(colors);
+        alphaTexture.Apply();
 
     }
 
@@ -353,12 +379,11 @@ public class TGMap : MonoBehaviour, ModifableInterface {
         return false;
     }
 
-    public void AddTextureToTerrain(List<Vector3> vList, float alpha = 1)
+    public void AddTextureToTerrain(List<Vector3> vList, VertexType brushType, float alpha = 1)
     {
         //List<Color[]> colorsList = new List<Color[]>();
         //List<int[]> tileXList = new List<int[]>();
         //List<int[]> tileZList = new List<int[]>();
-        RenderTexture tex = new RenderTexture(TILE_RESOLUTION, TILE_RESOLUTION, 0);
 
         foreach (var t in vList)
         {
@@ -369,11 +394,13 @@ public class TGMap : MonoBehaviour, ModifableInterface {
             //tex.alphaIsTransparency = true;
 
             TDTile[] tilesArray = GetVertexTiles(xPos, zPos);
-            int[,] tilePos = GetTilePositions(xPos, zPos);
+            //int[,] tilePos = GetTilePositions(xPos, zPos);
+            //int[,] tilePos = new int[4, 2] { { xPos - 1, zPos }, { xPos, zPos }, { xPos - 1, zPos + 1 }, { xPos, zPos + 1 } };
+            int[,] tilePos = new int[4, 2] { { xPos - 1 , zPos - 1 }, { xPos, zPos - 1 }, { xPos - 1, zPos }, { xPos, zPos } };
 
-            if (CheckTileVerticyTypes(tilesArray))
-            {
-                SetTileVertexType(tilesArray);
+            //if (CheckTileVerticyTypes(tilesArray))
+            //{
+                SetTileVertexType(tilesArray, brushType);
 
                 for (int i = 0; i < tilesArray.Length; i++)
                 {
@@ -382,15 +409,16 @@ public class TGMap : MonoBehaviour, ModifableInterface {
                     {
                         continue;
                     }
+
                     List<VertexType> vTypes = tile.GetVertexTypes();
-                    Color[][] cArray = new Color[vTypes.Count][];
+                    //Color[][] cArray = new Color[vTypes.Count][];
                     Texture2D[] tArray = new Texture2D[vTypes.Count];
 
                     for (int x = 0; x < vTypes.Count; x++)
                     {
                         if (x == 0)
                         {
-                            cArray[x] = GetSpriteTile((int)vTypes[x], 0);
+                            //cArray[x] = GetSpriteTile((int)vTypes[x], 0);
                             //cArray[x] = spriteTiles[(int)vTypes[x]][0];
 
                             tArray[x] = GetSpriteTexture((int)vTypes[x], 0);
@@ -399,35 +427,41 @@ public class TGMap : MonoBehaviour, ModifableInterface {
                         }
                         else
                         {
-                            cArray[x] = GetSpriteTile((int)vTypes[x], SpriteIndex(vTypes[x], tile.vertices));
+                            //cArray[x] = GetSpriteTile((int)vTypes[x], SpriteIndex(vTypes[x], tile.vertices));
                             //cArray[x] = spriteTiles[(int)vTypes[x]][SpriteIndex(vTypes[x], tile.vertices)];
                             tArray[x] = GetSpriteTexture((int)vTypes[x], SpriteIndex(vTypes[x], tile.vertices));
-
-                            //tex.SetPixels(tArray[x].GetPixels());
-                            Graphics.Blit(tArray[x], tex);
-                            //tex.SetPixels(tilePos[i, 0] * TILE_RESOLUTION, tilePos[i, 1] * TILE_RESOLUTION, TILE_RESOLUTION, TILE_RESOLUTION, tArray[x].GetPixels());
-                            //tex.Apply();
                         }
+                        //if(i == 2)
+                    //{
+                        RenderTexture.active = rt;                      //Set my RenderTexture active so DrawTexture will draw to it.
+                        GL.PushMatrix();                                //Saves both projection and modelview matrices to the matrix stack.
+                                                                        //GL.LoadPixelMatrix(0, texture.width, texture.height, 0);            //Setup a matrix for pixel-correct rendering.
+                        GL.LoadPixelMatrix(0, rt.width, 0, rt.height);
+                        //Draw my stampTexture on my RenderTexture positioned by posX and posY.
+                        //Graphics.DrawTexture(new Rect(tilePos[i, 0] - TILE_RESOLUTION, (rt.height - tilePos[i, 1]) - TILE_RESOLUTION, TILE_RESOLUTION, TILE_RESOLUTION), tArray[x]);
+                       
+                        Graphics.DrawTexture(new Rect(tilePos[i, 0] * TILE_RESOLUTION, tilePos[i, 1] * TILE_RESOLUTION, TILE_RESOLUTION, TILE_RESOLUTION), tArray[x]);
+                        GL.PopMatrix();                                //Restores both projection and modelview matrices off the top of the matrix stack.
+                        RenderTexture.active = null;                    //De-activate my Ren 
+                    //}
+                }
 
-                    }
+                  
 
-                    //Color[] colors = new Color[TILE_RESOLUTION * TILE_RESOLUTION];
+                    ////Color[] colors = new Color[TILE_RESOLUTION * TILE_RESOLUTION];
 
                     //Color[] colors = BlendedTile(cArray, alpha);
                     //tile.sprite = colors;
-                    //tex.Apply();
+                    ////tex.Apply();
 
-                    //colorsList.Add(colors);
-                    //tileXList.Add(tilePos[i, 0);
+                    ////colorsList.Add(colors);
+                    ////tileXList.Add(tilePos[i, 0);
                     //texture.SetPixels(tilePos[i, 0] * TILE_RESOLUTION, tilePos[i, 1] * TILE_RESOLUTION, TILE_RESOLUTION, TILE_RESOLUTION, colors);
-
-
                 }
 
-
-            }
+            //}
         }
-        renderer.material.SetTexture("_MainTex", tex);
+        //renderer.material.SetTexture("_MainTex", tex);
         //tex.Apply();
         //texture.Apply();
     }
@@ -502,23 +536,23 @@ public class TGMap : MonoBehaviour, ModifableInterface {
         return tilePos;
     }
 
-    void SetTileVertexType(TDTile[] tiles)
+    void SetTileVertexType(TDTile[] tiles, VertexType brushType)
     {
         if(tiles[0] != null)
         {
-            tiles[0].vertices[TDTile.TOP_RIGHT_VERTEX].type = MapEditorManager.main.vType;
+            tiles[0].vertices[TDTile.BOT_RIGHT_VERTEX].type = brushType;
         }
         if (tiles[1] != null)
         {
-            tiles[1].vertices[TDTile.TOP_LEFT_VERTEX].type = MapEditorManager.main.vType;
+            tiles[1].vertices[TDTile.BOT_LEFT_VERTEX].type = brushType;
         }
         if (tiles[2] != null)
         {
-            tiles[2].vertices[TDTile.BOT_RIGHT_VERTEX].type = MapEditorManager.main.vType;
+            tiles[2].vertices[TDTile.TOP_RIGHT_VERTEX].type = brushType;
         }
         if (tiles[3] != null)
         {
-            tiles[3].vertices[TDTile.BOT_LEFT_VERTEX].type = MapEditorManager.main.vType;
+            tiles[3].vertices[TDTile.TOP_LEFT_VERTEX].type = brushType;
         }
     }
 
@@ -563,7 +597,8 @@ public class TGMap : MonoBehaviour, ModifableInterface {
 
         TDTile[] tilesArray = GetVertexTiles(xPos, zPos);
 
-        int[,] tilePos = GetTilePositions(xPos, zPos);
+        //int[,] tilePos = GetTilePositions(xPos, zPos);
+        int[,] tilePos = new int[4, 2] { { xPos - 1, zPos - 1 }, { xPos, zPos - 1 }, { xPos - 1, zPos }, { xPos, zPos } };
         int[,] cliffPos = new int[4, 2] { { worldXPos - 1, worldZPos - 1 }, { worldXPos + 1, worldZPos - 1 }, { worldXPos - 1, worldZPos + 1 }, { worldXPos + 1, worldZPos + 1 } };
 
         if(IsAlreadyACliff(tilesArray, test, height))
@@ -571,32 +606,23 @@ public class TGMap : MonoBehaviour, ModifableInterface {
             return;
         }
 
-        newVert = GetVertsAtPoint(xPos, zPos);
-        if (newVert.y < test.y + height)
+        newVert = GetDisplacedVert(xPos, zPos);
+        if(height == 0)
         {
-            newVert.y += height;
+            newVert.y = height;
         }
         else
         {
-            newVert.y = test.y + height;
+            if (newVert.y < test.y + height)
+            {
+                newVert.y += height;
+            }
+            else
+            {
+                newVert.y = test.y + height;
+            }
         }
-        verts[zPos * vMapSize + xPos] = newVert;
-
-        //    List<Vector3> combinedVerts = new List<Vector3>();
-        //for (int z = 0; z < splitVerts.Length; z++)
-        //{
-        //    for(int y = 0; y < splitVerts[z].Length; y++)
-        //    {
-        //        combinedVerts.Add(splitVerts[z][y]);
-        //    }
-        //}
-
-        Vector3[] newVerts = verts;
-
-        mesh.vertices = newVerts;
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-        meshCollider.sharedMesh = mesh;
+        displacedVerts[zPos * vMapSize + xPos] = newVert;
 
         SetTileCliffType(tilesArray, height);
 
@@ -626,18 +652,10 @@ public class TGMap : MonoBehaviour, ModifableInterface {
                 Destroy(tile.cliffModel);
                 tile.cliffModel = null;
             }
-
-            Color[] colors = new Color[TILE_RESOLUTION * TILE_RESOLUTION];
             
             if (isTileHidden)
             {
                 tile.type = TileType.CLIFF;
-                for (int z = 0; z < colors.Length; z++)
-                {
-                    colors[i] = new Color(0, 0, 0, 0.01f);
-                }
-
-               // colors = tile.sprite;
                 
 
                 float xInst = (float)(cliffPos[i, 0] + xPos) / 2;
@@ -646,17 +664,44 @@ public class TGMap : MonoBehaviour, ModifableInterface {
                 int[] numbers = new int[] { tile.vertices[0].height, tile.vertices[1].height, tile.vertices[2].height, tile.vertices[3].height };
                 int baseHeight = numbers.Min();
                 //print(tile.GetVertexCliff(baseHeight));
-                GameObject wall = Instantiate(Resources.Load("Cliffs/Grass/" + tile.GetVertexCliff(baseHeight)), new Vector3(xInst, baseHeight, zInst), transform.rotation) as GameObject;
-                wall.transform.parent = gameObject.transform;
-                tile.cliffModel = wall;
+                string cliffText = tile.GetVertexCliff(baseHeight);
+                if (cliffText == "AAAA")
+                {
+                    tile.type = TileType.GROUND;
+                    isTileHidden = false;
+                    print(tile.cliffModel);
+                }
+                else
+                {
+                    GameObject wall = Instantiate(Resources.Load("Cliffs/Grass/" + cliffText), new Vector3(xInst, baseHeight, zInst), transform.rotation) as GameObject;
+                    wall.transform.parent = gameObject.transform;
+                    tile.cliffModel = wall;
+                }
             }
             else
             {
                 tile.type = TileType.GROUND;
-                colors = spriteTiles[0][0];
+            }
+            List<VertexType> vTypes = tile.GetVertexTypes();
+            SetTileVertexType(tilesArray, VertexType.ONE);
+
+            RenderTexture.active = rt;                      //Set my RenderTexture active so DrawTexture will draw to it.
+            GL.PushMatrix();                                //Saves both projection and modelview matrices to the matrix stack.
+                                                            //GL.LoadPixelMatrix(0, texture.width, texture.height, 0);            //Setup a matrix for pixel-correct rendering.
+            GL.LoadPixelMatrix(0, rt.width, 0, rt.height);
+            if(isTileHidden)
+            {
+                Graphics.CopyTexture(alphaTexture, 0, 0, 0, 0, TILE_RESOLUTION, TILE_RESOLUTION, rt, 0, 0, tilePos[i, 0] * TILE_RESOLUTION, tilePos[i, 1] * TILE_RESOLUTION);
+            }
+            else
+            {
+                Graphics.CopyTexture(GetSpriteTexture(0,0), 0, 0, 0, 0, TILE_RESOLUTION, TILE_RESOLUTION, rt, 0, 0, tilePos[i, 0] * TILE_RESOLUTION, tilePos[i, 1] * TILE_RESOLUTION);
             }
 
-            texture.SetPixels(tilePos[i, 0] * TILE_RESOLUTION, tilePos[i, 1] * TILE_RESOLUTION, TILE_RESOLUTION, TILE_RESOLUTION, colors);
+            GL.PopMatrix();                                //Restores both projection and modelview matrices off the top of the matrix stack.
+            RenderTexture.active = null;                    //De-activate my Ren 
+                                                            //}
+                                                            //}
 
             for (int x = 0; x < tile.vertices.Length; x++)
             {
@@ -669,7 +714,7 @@ public class TGMap : MonoBehaviour, ModifableInterface {
             }
         }
 
-        texture.Apply();
+        //texture.Apply();
     }
 
     // 0 = bottom left
@@ -711,7 +756,7 @@ public class TGMap : MonoBehaviour, ModifableInterface {
                     newVert.y += 0.5f;
                 }
 
-                verts[zPos * vMapSize + xPos] = newVert;
+                displacedVerts[zPos * vMapSize + xPos] = newVert;
 
                 for(int i = 0; i < tilesArray.Length; i++)
                 {
@@ -722,30 +767,16 @@ public class TGMap : MonoBehaviour, ModifableInterface {
                         tile.cliffModel = null;
                     }
 
-                    Color[] colors = new Color[TILE_RESOLUTION * TILE_RESOLUTION];
-
-                    if(tile.isRamp())
+                    List<VertexType> vTypes = tile.GetVertexTypes();
+                    SetTileVertexType(tilesArray, VertexType.ONE);
+                    if (tile.isRamp())
                     {
-                        tilesArray[i].type = TileType.RAMP;
-                        colors = spriteTiles[0][0];
+                        Graphics.CopyTexture(GetSpriteTexture(0, 0), 0, 0, 0, 0, TILE_RESOLUTION, TILE_RESOLUTION, rt, 0, 0, tilePos[i, 0] * TILE_RESOLUTION, tilePos[i, 1] * TILE_RESOLUTION);
                     }
                     else
                     {
-                        for (int z = 0; z < colors.Length; z++)
-                        {
-                            colors[0] = new Color(0, 0, 0, 0.01f);
-                        }
+                        Graphics.CopyTexture(alphaTexture, 0, 0, 0, 0, TILE_RESOLUTION, TILE_RESOLUTION, rt, 0, 0, tilePos[i, 0] * TILE_RESOLUTION, tilePos[i, 1] * TILE_RESOLUTION);
                     }
-
-                    texture.SetPixels(tilePos[i, 0] * TILE_RESOLUTION, tilePos[i, 1] * TILE_RESOLUTION, TILE_RESOLUTION, TILE_RESOLUTION, colors);
-
-                    //print(baseHeight);
-
-                    
-                    //TODO: ADD CORRECT TEXTURE
-                    //GameObject ramp = Instantiate(Resources.Load("CliffRamps/" + tile.GetRampModel(baseHeight)), new Vector3(xInst, baseHeight, zInst), transform.rotation) as GameObject;
-                    //ramp.transform.parent = gameObject.transform;
-                    //tile.cliffModel = ramp;
                 }
             }
 
@@ -775,15 +806,13 @@ public class TGMap : MonoBehaviour, ModifableInterface {
                 }
             }
 
-            texture.Apply();
+            //Vector3[] newVerts = verts;
 
-            Vector3[] newVerts = verts;
+            //mesh.vertices = newVerts;
 
-            mesh.vertices = newVerts;
-
-            mesh.RecalculateNormals();
-            mesh.RecalculateBounds();
-            meshCollider.sharedMesh = mesh;
+            //mesh.RecalculateNormals();
+            //mesh.RecalculateBounds();
+            //meshCollider.sharedMesh = mesh;
         }
     }
 
@@ -804,24 +833,7 @@ public class TGMap : MonoBehaviour, ModifableInterface {
 
         TDTile[] tilesArray = GetVertexTiles(xPos, zPos);
 
-        //for (int h = 0; h < splitVerts.Length; h++)
-        //{
-        //    for (int index = 0; index < splitVerts[h].Length; index++)
-        //    {
-        //        float distance = Vector3.Distance(splitVerts[h][index], test);
-
-        //        //if vert is within the radius 
-        //        if (distance < radius)
-        //        {
-        //            newVert = splitVerts[h][index];
-        //            newVert.y += 0.02f;
-        //            splitVerts[h][index] = newVert;
-
-        //        }
-
-        //    }
-        //}
-        newVert = GetVertsAtPoint(xPos, zPos);
+        newVert = GetDisplacedVert(xPos, zPos);
         if(newVert != Vector3.zero)
         {
             if (lowerHeight)
@@ -833,25 +845,25 @@ public class TGMap : MonoBehaviour, ModifableInterface {
                 newVert.y += 0.02f;
             }
 
-            verts[zPos * vMapSize + xPos] = newVert;
+            displacedVerts[zPos * vMapSize + xPos] = newVert;
 
-            SetTileVertices(tilesArray, GetVertsAtPoint(xPos, zPos));
+            SetTileVertices(tilesArray, GetDisplacedVert(xPos, zPos));
 
             foreach (TDTile tile in tilesArray)
             {
                 if (tile != null && tile.cliffModel != null)
                 {
-                    tile.cliffModel.GetComponentInChildren<ModifyCliff>().ModifyVerteces(transform.TransformPoint(GetVertsAtPoint(xPos, zPos)), lowerHeight);
+                    tile.cliffModel.GetComponentInChildren<ModifyCliff>().ModifyVerteces(transform.TransformPoint(GetDisplacedVert(xPos, zPos)), lowerHeight);
                 }
             }
 
-            Vector3[] newVerts = verts;
+            //Vector3[] newVerts = verts;
 
-            mesh.vertices = newVerts;
+            mesh.vertices = displacedVerts;
 
             //mesh.RecalculateNormals();
             //mesh.RecalculateBounds();
-            meshCollider.sharedMesh = mesh;
+            //meshCollider.sharedMesh = mesh;
         }
     }
 
@@ -897,22 +909,50 @@ public class TGMap : MonoBehaviour, ModifableInterface {
     {
         if (tiles.ElementAtOrDefault(0) != null)
         {
-            tiles[0].vertices[TDTile.TOP_RIGHT_VERTEX].height += y;
+            if(y == 0)
+            {
+                tiles[0].vertices[TDTile.TOP_RIGHT_VERTEX].height = y;
+            }
+            else
+            {
+                tiles[0].vertices[TDTile.TOP_RIGHT_VERTEX].height += y;
+            }
         }
 
         if (tiles.ElementAtOrDefault(1) != null)
         {
-            tiles[1].vertices[TDTile.TOP_LEFT_VERTEX].height += y;
+            if (y == 0)
+            {
+                tiles[1].vertices[TDTile.TOP_LEFT_VERTEX].height = y;
+            }
+            else
+            {
+                tiles[1].vertices[TDTile.TOP_LEFT_VERTEX].height += y;
+            }
         }
 
         if (tiles.ElementAtOrDefault(2) != null)
         {
-            tiles[2].vertices[TDTile.BOT_RIGHT_VERTEX].height += y;
+            if (y == 0)
+            {
+                tiles[2].vertices[TDTile.BOT_RIGHT_VERTEX].height = y;
+            }
+            else
+            {
+                tiles[2].vertices[TDTile.BOT_RIGHT_VERTEX].height += y;
+            }
         }
 
         if (tiles.ElementAtOrDefault(3) != null)
         {
-            tiles[3].vertices[TDTile.BOT_LEFT_VERTEX].height += y;
+            if (y == 0)
+            {
+                tiles[3].vertices[TDTile.BOT_LEFT_VERTEX].height = y;
+            }
+            else
+            {
+                tiles[3].vertices[TDTile.BOT_LEFT_VERTEX].height += y;
+            }
         }
 
     }
@@ -1013,6 +1053,65 @@ public class TGMap : MonoBehaviour, ModifableInterface {
         return vList;
     }
 
+    public void ApplyMeshCollider()
+    {
+        meshCollider.sharedMesh = mesh;
+    }
+
+    public void DeformMesh(Vector3 point, float force)
+    {
+        for (int i = 0; i < displacedVerts.Length; i++)
+        {
+            AddForceToVertex(i, point, force);
+        }
+    }
+
+    void AddForceToVertex(int i, Vector3 point, float force)
+    {
+        print(displacedVerts[i]);
+        if(Vector3.Distance(point, displacedVerts[i]) <= Brush.main.GetBrushSize())
+        {
+            Vector3 pointToVertex = displacedVerts[i] - point;
+            float attenuatedForce = force / (1f + pointToVertex.sqrMagnitude);
+            float velocity = attenuatedForce * Time.deltaTime;
+            vertexVelocities[i].y += pointToVertex.normalized.y * velocity;
+        }
+        else
+        {
+            vertexVelocities[i] = vertexVelocities[i];
+        }
+        //Vector3 pointToVertex = displacedVerts[i] - point;
+        //float attenuatedForce = force / (1f + pointToVertex.sqrMagnitude);
+        //float velocity = attenuatedForce * Time.deltaTime;
+        //vertexVelocities[i].y += pointToVertex.normalized.y * velocity;
+        //vertexVelocities[i].y += pointToVertex.normalized.y + 0.02f;
+    }
+
+    void Update()
+    {
+        //for (int i = 0; i < displacedVerts.Length; i++)
+        //{
+        //    UpdateVertex(i);
+        //}
+        if(Brush.main.brushState != BrushState.TEXTURE)
+        {
+            mesh.vertices = displacedVerts;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            //meshCollider.sharedMesh = mesh;
+        }
+    }
+
+    void UpdateVertex(int i)
+    {
+        Vector3 velocity = vertexVelocities[i];
+        Vector3 displacement = displacedVerts[i] - displacedVerts[i];
+        velocity -= displacement * springForce * Time.deltaTime;
+        velocity *= 1f - damping * Time.deltaTime;
+        vertexVelocities[i] = velocity;
+        displacedVerts[i] += velocity * Time.deltaTime;
+    }
+
     public void ChangeTextureBrush()
     {
         GameObject bType = GameObject.Find("Toggle (2)");
@@ -1046,5 +1145,10 @@ public class TGMap : MonoBehaviour, ModifableInterface {
     Vector3 GetVertsAtPoint(int x, int z)
     {
         return verts[z * vMapSize + x];
+    }
+
+    Vector3 GetDisplacedVert(int x, int z)
+    {
+        return displacedVerts[z * vMapSize + x];
     }
 }

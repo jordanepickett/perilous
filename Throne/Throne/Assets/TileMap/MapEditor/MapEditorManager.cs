@@ -26,7 +26,7 @@ public class MapEditorManager : MonoBehaviour {
     public GameObject mapChunk;
     private List<GenerateMesh> mapChunks;
 
-    public VertexType vType = VertexType.ONE;
+    public VertexType vType = VertexType.TWO;
 
 
     // Use this for initialization
@@ -74,7 +74,7 @@ public class MapEditorManager : MonoBehaviour {
         MainCameraTest camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<MainCameraTest>();
         camera.SetCameraBounds(tileMapDto.GetSizeX(), tileMapDto.GetSizeZ());
 
-        int chunks = tileMapDto.GetSizeX() / 32;
+        int chunks = tileMapDto.GetSizeX() / tileMapDto.GetSizeX();
         int mapSizeZ = tileMapDto.GetSizeZ() / chunks;
         int mapSizeX = tileMapDto.GetSizeX() / chunks;
         tileMapDto.SetSizeX(mapSizeX);
@@ -92,7 +92,7 @@ public class MapEditorManager : MonoBehaviour {
             //GameObject tgMap = Instantiate(Resources.Load("MapEditor/TileMap")) as GameObject;
         SetState(MapEditorState.EDITING);
         //tgMap.CreateNewTerrain(tileMapDto);
-        ChangeTextureBrush();
+        PrepareButtons();
 
     }
 
@@ -110,6 +110,17 @@ public class MapEditorManager : MonoBehaviour {
             selection.GetComponent<Button>().onClick.AddListener(delegate { SetBrush(copy); });
             selection.GetComponentInChildren<Text>().text = i.ToString();
         }
+    }
+
+    void ChangeCliffLevel()
+    {
+
+    }
+
+    void PrepareButtons()
+    {
+        ChangeTextureBrush();
+        ChangeCliffLevel();
     }
 
     public void Save()

@@ -31,7 +31,7 @@ public class TDTile {
         for(int i = 0; i < vertices.Length; i++)
         {
             vertices[i] = new TDVertex();
-            vertices[i].type = VertexType.ONE;
+            //vertices[i].type = VertexType.THREE;
         }
 
         SetVertexValues();

@@ -74,11 +74,11 @@ public class ModifyCliff : MonoBehaviour
             Vector3 roundedCliff = new Vector3(w.x, 0, w.z);
             Vector3 roundedPoint = new Vector3(t.x, 0, t.z);
             float distance = Vector3.Distance(roundedCliff, roundedPoint);
+            var test = transform.InverseTransformPoint(t);
             //print(verts[index]);
             //if vert is within the radius 
             if (distance < radius)
             {
-                var test = transform.InverseTransformPoint(t);
                 //print(test);
                 vertices[index] = test;
                 //print(t);
@@ -96,47 +96,6 @@ public class ModifyCliff : MonoBehaviour
         }
 
         mesh.vertices = vertices;
-
-        //Vector3 newVert = Vector3.zero;
-        //Vector3 test = t;
-        //int xPos = (int)test.x;
-        //int zPos = (int)test.z;
-
-        //int index;
-        //for (index = 0; index < verts.Length; index++)
-        //{
-        //    Vector3 w = transform.TransformPoint(verts[index]);
-        //    float distance = Vector3.Distance(w, test);
-        //    print(w);
-        //    //print(verts[index]);
-        //    //if vert is within the radius 
-        //    if (distance < radius)
-        //    {
-        //        newVert = verts[index];
-        //        if (lowerHeight)
-        //        {
-        //            //newVert.z -= 0.02f;
-        //            newVert = transform.InverseTransformPoint(new Vector3(verts[index].x, verts[index].y - 0.2f, verts[index].z));
-        //        }
-        //        else
-        //        {
-        //            newVert = transform.InverseTransformPoint(new Vector3(verts[index].x, verts[index].y + 0.2f, verts[index].z));
-        //        }
-        //        verts[index] = newVert;
-        //    }
-        //}
-
-        ////List<Vector3> combinedVerts = new List<Vector3>();
-        ////for (int z = 0; z < splitVerts.Length; z++)
-        ////{
-        ////    for (int y = 0; y < splitVerts[z].Length; y++)
-        ////    {
-        ////        combinedVerts.Add(splitVerts[z][y]);
-        ////    }
-        ////}
-
-        ////Vector3[] newVerts = combinedVerts.ToArray();
-        ////vertices = verts;
 
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();

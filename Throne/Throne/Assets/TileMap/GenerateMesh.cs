@@ -12,7 +12,7 @@ public class GenerateMesh : TGMap {
 
     public void CreateMesh(TileMapDTO tileMapDTO, int offsetX, int offsetZ)
     {
-        CreateTerrainTexture(tileMapDTO);
+        //CreateTerrainTexture(tileMapDTO);
 
         CreateSpriteTiles();
         //BuildNewMesh(tileMapDto);
@@ -134,5 +134,12 @@ public class GenerateMesh : TGMap {
 
         //SplitVerts();
         BuildTexture(tileMapDTO);
+
+        displacedVerts = new Vector3[vertices.Length];
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            displacedVerts[i] = verts[i];
+        }
+        vertexVelocities = new Vector3[vertices.Length];
     }
 }

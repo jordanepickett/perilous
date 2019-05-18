@@ -12,15 +12,27 @@ public enum BrushState
     OBJECTS,
     RAMPS
 }
+public enum CliffLevel
+{
+    FLATTEN,
+    LEVEL_ONE,
+    LEVEL_TWO
+}
 
 public delegate void ChangedBrushState(BrushState newState);
+public delegate void ChangedCliffLevel(CliffLevel newState);
 
 public class Brush : MonoBehaviour {
 
     public BrushState brushState = BrushState.TEXTURE;
+
+    public CliffLevel cliffLevel = CliffLevel.LEVEL_ONE;
+
     public Slider brushSizeSlider;
 
     public Toggle[] brushToggles;
+
+    public Toggle[] cliffToggles;
 
     public static Brush main;
 
@@ -33,6 +45,8 @@ public class Brush : MonoBehaviour {
     public GameObject selectedGameObject;
 
     public event ChangedBrushState ChangedBrushState;
+
+    public event ChangedCliffLevel ChangedCliffLevel;
 
     public int GetBrushSize()
     {
@@ -61,12 +75,37 @@ public class Brush : MonoBehaviour {
     void SetListeners()
     {
         //brushToggle.GetComponent<Button>().onClick.AddListener(delegate { SetState(); });
-        for(int i = 0; i < brushToggles.Length; i++)
+        SetBrushToggleListeners();
+        SetCliffLevelListeners();
+        brushSizeSlider.onValueChanged.AddListener(delegate { SetBrushSize(); });
+    }
+
+    void SetBrushToggleListeners()
+    {
+        for (int i = 0; i < brushToggles.Length; i++)
         {
             Toggle toggle = brushToggles[i];
             toggle.onValueChanged.AddListener(delegate { SetState(toggle); });
         }
-        brushSizeSlider.onValueChanged.AddListener(delegate { SetBrushSize(); });
+    }
+
+    void SetCliffLevelListeners()
+    {
+        for (int i = 0; i < cliffToggles.Length; i++)
+        {
+            Toggle toggle = cliffToggles[i];
+            toggle.onValueChanged.AddListener(delegate { SetCliffLevel(toggle); });
+        }
+    }
+
+    void SetCliffLevel(Toggle toggle)
+    {
+        if (toggle.isOn)
+        {
+            cliffLevel = (CliffLevel)Array.IndexOf(cliffToggles, toggle);
+            ChangedCliffLevel(cliffLevel);
+            Debug.Log(cliffLevel);
+        }
     }
 
     void SetState(Toggle toggle)

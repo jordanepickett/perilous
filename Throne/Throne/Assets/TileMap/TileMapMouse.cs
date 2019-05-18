@@ -21,6 +21,9 @@ public class TileMapMouse : MonoBehaviour {
 
     public static bool newSession = true;
 
+    public float force = 10f;
+    public float forceOffset = 0.1f;
+
 
     private void Start()
     {
@@ -31,6 +34,7 @@ public class TileMapMouse : MonoBehaviour {
         maps = new List<ModifableInterface>();
 
         Brush.main.ChangedBrushState += OnChangedBrushState;
+        Brush.main.ChangedCliffLevel += OnChangedCliffLevelState;
     }
 
     // Update is called once per frame
@@ -40,6 +44,7 @@ public class TileMapMouse : MonoBehaviour {
         {
             return;
         }
+        ScrollMouse();
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
@@ -53,21 +58,7 @@ public class TileMapMouse : MonoBehaviour {
             currentTileCoord.z = z;
             //print("X POS: " + currentTileCoord.x + " Z POS: " + currentTileCoord.z);
 
-            if (Input.GetMouseButtonDown(0))
-            {
-
-                if (hit.collider.gameObject.GetComponent<TGMap>())
-                {
-                    map = hit.collider.gameObject.GetComponent<TGMap>();
-                }
-                currentTileCoord.y = y;
-
-                if(Brush.main.brushState == BrushState.TEXTURE)
-                {
-                    BrushTexture();
-                }
-                test = currentTileCoord;
-            }
+            FirstClick(hit, y);
             //Debug.Log(currentTileCoord);
 
             selectionCube.transform.position = new Vector3(currentTileCoord.x, y, currentTileCoord.z) * 1;
@@ -93,6 +84,11 @@ public class TileMapMouse : MonoBehaviour {
                         break;
                     case (BrushState.VERTEX):
                         VertexModifier();
+                        //print(hit.point);
+                        //print(test);
+                        //Vector3 point = hit.point;
+                        //point += hit.normal * forceOffset;
+                        //map.DeformMesh(point, force);
                         break;
                     case (BrushState.OBJECTS):
                         ObjectPlacement();
@@ -106,7 +102,7 @@ public class TileMapMouse : MonoBehaviour {
                 }
             }
 
-            if(Brush.main.brushState == BrushState.OBJECTS && objectToBePlaced != null)
+            if (Brush.main.brushState == BrushState.OBJECTS && objectToBePlaced != null)
             {
                 RaycastHit hitPlace;
                 Ray rayHit = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -116,6 +112,14 @@ public class TileMapMouse : MonoBehaviour {
                     objectToBePlaced.transform.position = new Vector3(
                         Mathf.Round(hitPlace.point.x), hitPlace.point.y + 0.3f, Mathf.Round(hitPlace.point.z));
 
+                }
+            }
+
+            if(Input.GetMouseButtonUp(0))
+            {
+                if(Brush.main.brushState != BrushState.TEXTURE)
+                {
+                    map.ApplyMeshCollider();
                 }
             }
         }
@@ -131,6 +135,11 @@ public class TileMapMouse : MonoBehaviour {
         {
             objectToBePlaced = null;
         }
+    }
+
+    void OnChangedCliffLevelState(CliffLevel state)
+    {
+
     }
 
     void BrushTexture()
@@ -150,7 +159,7 @@ public class TileMapMouse : MonoBehaviour {
 
         foreach (var map in maps)
         {
-            map.AddTextureToTerrain(vectorList);
+            map.AddTextureToTerrain(vectorList, MapEditorManager.main.vType);
         }
     }
 
@@ -179,13 +188,15 @@ public class TileMapMouse : MonoBehaviour {
 
     int CliffHeight()
     {
-        int height = 1;
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            height = -1;
-        }
+        //int height = 1;
+        //if (Input.GetKey(KeyCode.LeftShift))
+        //{
+        //    height = -1;
+        //}
 
-        return height;
+        //return height;
+        int level = (int)Brush.main.cliffLevel;
+        return level;
     }
 
     void VertexModifier()
@@ -258,6 +269,37 @@ public class TileMapMouse : MonoBehaviour {
             if (hitColliders[i].GetComponentInChildren<ModifableInterface>() != null)
             {
                 //maps.Add((hitColliders[i].GetComponentInChildren<ModifableInterface>()));
+            }
+        }
+    }
+
+    void ScrollMouse()
+    {
+        if(Input.GetAxis("Mouse ScrollWheel") > 0)
+        {
+            transform.position = new Vector3(transform.position.x, transform.position.y - .3f, transform.position.z + .3f);
+        }
+        if(Input.GetAxis("Mouse ScrollWheel") < 0)
+        {
+            transform.position = new Vector3(transform.position.x, transform.position.y + .3f, transform.position.z - .3f);
+        }
+    }
+
+    void FirstClick(RaycastHit hit, float y)
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+
+            if (hit.collider.gameObject.GetComponent<TGMap>())
+            {
+                map = hit.collider.gameObject.GetComponent<TGMap>();
+            }
+            currentTileCoord.y = y;
+
+            test = currentTileCoord;
+            if (Brush.main.brushState == BrushState.TEXTURE)
+            {
+                BrushTexture();
             }
         }
     }
